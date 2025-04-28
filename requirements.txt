@@ -3,4 +3,8 @@ scipy>=1.7.0
 qiskit>=0.34.0
 matplotlib>=3.4.0
 pytest>=6.2.5
-cryptography>=3.4.8 
+cryptography>=3.4.8
+fastapi==0.103.1
+uvicorn==0.23.2
+pydantic>=1.10.0,<2.0.0
+python-multipart>=0.0.5

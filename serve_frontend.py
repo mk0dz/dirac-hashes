@@ -1,0 +1,76 @@
+#!/usr/bin/env python3
+"""
+Serve the Dirac Hashes frontend.
+
+This script starts a simple HTTP server to serve the frontend files.
+"""
+
+import http.server
+import socketserver
+import os
+import sys
+import webbrowser
+from urllib.parse import urlparse
+
+# Configuration
+PORT = 8080
+DIRECTORY = "frontend"
+
+class Handler(http.server.SimpleHTTPRequestHandler):
+    """Custom handler for serving from DIRECTORY."""
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, directory=DIRECTORY, **kwargs)
+    
+    def end_headers(self):
+        # Add CORS headers
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+        super().end_headers()
+
+def main():
+    """Run the server."""
+    # Check if the API server is running
+    try:
+        import requests
+        response = requests.get('http://localhost:8000/')
+        if response.status_code != 200:
+            print("Warning: API server doesn't seem to be responding correctly.")
+            print("Make sure to start the API server with: python run_api.py")
+    except:
+        print("Warning: API server doesn't seem to be running.")
+        print("Make sure to start the API server with: python run_api.py")
+    
+    # Create server
+    try:
+        handler = Handler
+        httpd = socketserver.TCPServer(("", PORT), handler)
+        
+        print(f"Serving frontend at http://localhost:{PORT}")
+        
+        # Open browser
+        webbrowser.open(f"http://localhost:{PORT}")
+        
+        # Start server
+        httpd.serve_forever()
+    except KeyboardInterrupt:
+        print("\nShutting down server...")
+        httpd.server_close()
+        sys.exit(0)
+    except OSError as e:
+        if e.errno == 98:  # Address already in use
+            print(f"Error: Port {PORT} is already in use.")
+            print(f"Try accessing the frontend at http://localhost:{PORT}")
+            sys.exit(1)
+        else:
+            raise
+
+if __name__ == "__main__":
+    # Make sure we're in the project root
+    if not os.path.isdir(DIRECTORY):
+        print(f"Error: {DIRECTORY} directory not found.")
+        print("Make sure you're running this script from the project root.")
+        sys.exit(1)
+        
+    main() 

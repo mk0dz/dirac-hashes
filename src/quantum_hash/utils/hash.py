@@ -73,7 +73,7 @@ def quantum_hash(data: Union[bytes, str], algorithm: str = 'hybrid',
         # Generate a seed from the data for consistent hashing
         seed_hash = hashlib.sha256(data).digest()
         
-        # Use different parts of the seed for each hash function
+        # Generate both hashes with the same digest size
         hash1 = grover_hash(data, digest_size)
         hash2 = shor_hash(data, digest_size)
         

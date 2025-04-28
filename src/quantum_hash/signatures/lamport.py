@@ -122,12 +122,8 @@ class LamportSignature:
             # Hash the signature component using the same algorithm
             sig_hash = self.hasher.hash(signature[i], algorithm=self.hash_algorithm)
             
-            # Convert both hashes to bytes for consistent comparison
-            # This ensures compatibility with different hash implementations
-            expected_hash = public_key[i][bit_value]
-            
             # Compare with the public key component
-            if sig_hash != expected_hash:
+            if sig_hash != public_key[i][bit_value]:
                 return False
         
         return True 

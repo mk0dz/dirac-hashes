@@ -4,7 +4,7 @@ Dirac Hashes - Main interface module.
 This module provides easy access to all quantum-inspired hash and key functions.
 """
 
-from typing import Tuple, Dict, Union, Optional
+from typing import Tuple, Dict, Union, Optional, List
 
 from src.quantum_hash.core.grover import grover_hash
 from src.quantum_hash.core.shor import shor_hash, shor_inspired_key_generation
@@ -32,6 +32,8 @@ class DiracHash:
     This class provides an easy-to-use interface for all quantum-inspired
     hash and key generation functions.
     """
+    
+    ALGORITHMS = ['improved', 'grover', 'shor', 'hybrid', 'improved_grover', 'improved_shor']
     
     @staticmethod
     def hash(data: Union[bytes, str], algorithm: str = 'improved', 
@@ -169,4 +171,9 @@ class DiracHash:
         Returns:
             True if optimized implementations are available, False otherwise
         """
-        return _HAVE_OPTIMIZED 
+        return _HAVE_OPTIMIZED
+
+    @staticmethod
+    def get_supported_algorithms() -> List[str]:
+        """Return a list of supported algorithms."""
+        return ['improved', 'grover', 'shor', 'hybrid', 'improved_grover', 'improved_shor'] 

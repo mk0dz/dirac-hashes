@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dirac Hashes Dashboard</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">Dirac Hashes</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#" data-page="dashboard">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-page="hash-testing">Hash Testing</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-page="signatures">Signatures</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-page="kem">Key Encapsulation</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Dashboard Page -->
+        <div class="page active" id="dashboard">
+            <h1 class="mb-4">Quantum-Inspired Cryptography Dashboard</h1>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5>Hash Algorithm Performance</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="hashPerformanceChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5>Signature Scheme Comparison</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="signatureComparisonChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>API Status</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="apiStatus" class="alert alert-info">
+                                Checking API status...
+                            </div>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Endpoint</th>
+                                        <th>Status</th>
+                                        <th>Response Time</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="endpointStatus">
+                                    <!-- Will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hash Testing Page -->
+        <div class="page" id="hash-testing">
+            <h1 class="mb-4">Hash Function Testing</h1>
+            
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Generate Hash</h5>
+                </div>
+                <div class="card-body">
+                    <form id="hashForm">
+                        <div class="mb-3">
+                            <label for="message" class="form-label">Message</label>
+                            <textarea class="form-control" id="message" rows="3" required></textarea>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="algorithm" class="form-label">Algorithm</label>
+                                    <select class="form-select" id="algorithm">
+                                        <option value="improved">Improved (Default)</option>
+                                        <option value="grover">Grover</option>
+                                        <option value="shor">Shor</option>
+                                        <option value="hybrid">Hybrid</option>
+                                        <option value="improved_grover">Improved Grover</option>
+                                        <option value="improved_shor">Improved Shor</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="encoding" class="form-label">Encoding</label>
+                                    <select class="form-select" id="encoding">
+                                        <option value="utf-8">UTF-8</option>
+                                        <option value="hex">Hex</option>
+                                        <option value="base64">Base64</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Generate Hash</button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Hash Result</h5>
+                </div>
+                <div class="card-body">
+                    <div id="hashResult" class="alert alert-light">
+                        No hash generated yet.
+                    </div>
+                    <div id="hashDetails" class="d-none">
+                        <table class="table">
+                            <tr>
+                                <th>Algorithm</th>
+                                <td id="resultAlgorithm"></td>
+                            </tr>
+                            <tr>
+                                <th>Digest Length</th>
+                                <td id="resultDigestLength"></td>
+                            </tr>
+                            <tr>
+                                <th>Time</th>
+                                <td id="resultTime"></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Compare Hash Algorithms</h5>
+                </div>
+                <div class="card-body">
+                    <form id="compareForm">
+                        <div class="mb-3">
+                            <label for="compareMessage" class="form-label">Message</label>
+                            <textarea class="form-control" id="compareMessage" rows="3" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Algorithms to Compare</label>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="improvedCheck" checked>
+                                        <label class="form-check-label" for="improvedCheck">Improved</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="groverCheck" checked>
+                                        <label class="form-check-label" for="groverCheck">Grover</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="shorCheck" checked>
+                                        <label class="form-check-label" for="shorCheck">Shor</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="hybridCheck" checked>
+                                        <label class="form-check-label" for="hybridCheck">Hybrid</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="improvedGroverCheck" checked>
+                                        <label class="form-check-label" for="improvedGroverCheck">Improved Grover</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="improvedShorCheck" checked>
+                                        <label class="form-check-label" for="improvedShorCheck">Improved Shor</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="compareEncoding" class="form-label">Encoding</label>
+                            <select class="form-select" id="compareEncoding">
+                                <option value="utf-8">UTF-8</option>
+                                <option value="hex">Hex</option>
+                                <option value="base64">Base64</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Compare Algorithms</button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h5>Comparison Results</h5>
+                </div>
+                <div class="card-body">
+                    <div id="compareResults" class="alert alert-light">
+                        No comparison performed yet.
+                    </div>
+                    <div class="row d-none" id="comparisonCharts">
+                        <div class="col-md-6">
+                            <canvas id="timeComparisonChart"></canvas>
+                        </div>
+                        <div class="col-md-6">
+                            <canvas id="lengthComparisonChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="table-responsive d-none" id="comparisonTable">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Algorithm</th>
+                                    <th>Hash</th>
+                                    <th>Length</th>
+                                    <th>Time (ms)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="compareTableBody">
+                                <!-- Will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Signatures Page -->
+        <div class="page" id="signatures">
+            <h1 class="mb-4">Digital Signature Testing</h1>
+            
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Generate Key Pair</h5>
+                </div>
+                <div class="card-body">
+                    <form id="keyPairForm">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="signatureScheme" class="form-label">Signature Scheme</label>
+                                    <select class="form-select" id="signatureScheme">
+                                        <option value="lamport">Lamport</option>
+                                        <option value="sphincs">SPHINCS+</option>
+                                        <option value="dilithium" selected>Dilithium</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="signatureHashAlgo" class="form-label">Hash Algorithm</label>
+                                    <select class="form-select" id="signatureHashAlgo">
+                                        <option value="improved" selected>Improved</option>
+                                        <option value="grover">Grover</option>
+                                        <option value="shor">Shor</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="securityLevel" class="form-label">Security Level (1-5)</label>
+                                    <input type="number" class="form-control" id="securityLevel" min="1" max="5" value="2">
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Generate Key Pair</button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Key Pair Result</h5>
+                </div>
+                <div class="card-body">
+                    <div id="keyPairResult" class="alert alert-light">
+                        No key pair generated yet.
+                    </div>
+                    <div id="keyPairDetails" class="d-none">
+                        <div class="mb-3">
+                            <label class="form-label">Private Key</label>
+                            <textarea class="form-control" id="privateKey" rows="3" readonly></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Public Key</label>
+                            <textarea class="form-control" id="publicKey" rows="3" readonly></textarea>
+                        </div>
+                        <table class="table">
+                            <tr>
+                                <th>Scheme</th>
+                                <td id="keyPairScheme"></td>
+                            </tr>
+                            <tr>
+                                <th>Hash Algorithm</th>
+                                <td id="keyPairHash"></td>
+                            </tr>
+                            <tr>
+                                <th>Security Level</th>
+                                <td id="keyPairSecurityLevel"></td>
+                            </tr>
+                            <tr>
+                                <th>Generation Time</th>
+                                <td id="keyPairTime"></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Sign Message</h5>
+                </div>
+                <div class="card-body">
+                    <form id="signForm">
+                        <div class="mb-3">
+                            <label for="signMessage" class="form-label">Message to Sign</label>
+                            <textarea class="form-control" id="signMessage" rows="3" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="signPrivateKey" class="form-label">Private Key</label>
+                            <textarea class="form-control" id="signPrivateKey" rows="3" required></textarea>
+                            <small class="form-text text-muted">Use the private key generated above or paste your own.</small>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="signScheme" class="form-label">Signature Scheme</label>
+                                    <select class="form-select" id="signScheme">
+                                        <option value="lamport">Lamport</option>
+                                        <option value="sphincs">SPHINCS+</option>
+                                        <option value="dilithium" selected>Dilithium</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="signHashAlgo" class="form-label">Hash Algorithm</label>
+                                    <select class="form-select" id="signHashAlgo">
+                                        <option value="improved" selected>Improved</option>
+                                        <option value="grover">Grover</option>
+                                        <option value="shor">Shor</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="signEncoding" class="form-label">Encoding</label>
+                                    <select class="form-select" id="signEncoding">
+                                        <option value="utf-8">UTF-8</option>
+                                        <option value="hex">Hex</option>
+                                        <option value="base64">Base64</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Sign Message</button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Signature Result</h5>
+                </div>
+                <div class="card-body">
+                    <div id="signResult" class="alert alert-light">
+                        No signature generated yet.
+                    </div>
+                    <div id="signDetails" class="d-none">
+                        <div class="mb-3">
+                            <label class="form-label">Signature</label>
+                            <textarea class="form-control" id="signature" rows="3" readonly></textarea>
+                        </div>
+                        <table class="table">
+                            <tr>
+                                <th>Scheme</th>
+                                <td id="signatureSchemeResult"></td>
+                            </tr>
+                            <tr>
+                                <th>Hash Algorithm</th>
+                                <td id="signatureHashResult"></td>
+                            </tr>
+                            <tr>
+                                <th>Signature Size</th>
+                                <td id="signatureSizeResult"></td>
+                            </tr>
+                            <tr>
+                                <th>Signing Time</th>
+                                <td id="signatureTimeResult"></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Verify Signature</h5>
+                </div>
+                <div class="card-body">
+                    <form id="verifyForm">
+                        <div class="mb-3">
+                            <label for="verifyMessage" class="form-label">Original Message</label>
+                            <textarea class="form-control" id="verifyMessage" rows="3" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="verifySignature" class="form-label">Signature</label>
+                            <textarea class="form-control" id="verifySignature" rows="3" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="verifyPublicKey" class="form-label">Public Key</label>
+                            <textarea class="form-control" id="verifyPublicKey" rows="3" required></textarea>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="verifyScheme" class="form-label">Signature Scheme</label>
+                                    <select class="form-select" id="verifyScheme">
+                                        <option value="lamport">Lamport</option>
+                                        <option value="sphincs">SPHINCS+</option>
+                                        <option value="dilithium" selected>Dilithium</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="verifyHashAlgo" class="form-label">Hash Algorithm</label>
+                                    <select class="form-select" id="verifyHashAlgo">
+                                        <option value="improved" selected>Improved</option>
+                                        <option value="grover">Grover</option>
+                                        <option value="shor">Shor</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="verifyEncoding" class="form-label">Encoding</label>
+                                    <select class="form-select" id="verifyEncoding">
+                                        <option value="utf-8">UTF-8</option>
+                                        <option value="hex">Hex</option>
+                                        <option value="base64">Base64</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Verify Signature</button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h5>Verification Result</h5>
+                </div>
+                <div class="card-body">
+                    <div id="verifyResult" class="alert alert-light">
+                        No verification performed yet.
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- KEM Page -->
+        <div class="page" id="kem">
+            <h1 class="mb-4">Key Encapsulation Mechanism Testing</h1>
+            
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Generate KEM Key Pair</h5>
+                </div>
+                <div class="card-body">
+                    <form id="kemKeyPairForm">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="kemScheme" class="form-label">KEM Scheme</label>
+                                    <select class="form-select" id="kemScheme">
+                                        <option value="kyber" selected>Kyber</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="kemHashAlgo" class="form-label">Hash Algorithm</label>
+                                    <select class="form-select" id="kemHashAlgo">
+                                        <option value="improved" selected>Improved</option>
+                                        <option value="grover">Grover</option>
+                                        <option value="shor">Shor</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="kemSecurityLevel" class="form-label">Security Level (1, 3, or 5)</label>
+                                    <select class="form-select" id="kemSecurityLevel">
+                                        <option value="1">1 (Kyber-512)</option>
+                                        <option value="3">3 (Kyber-768)</option>
+                                        <option value="5">5 (Kyber-1024)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Generate KEM Key Pair</button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>KEM Key Pair Result</h5>
+                </div>
+                <div class="card-body">
+                    <div id="kemKeyPairResult" class="alert alert-light">
+                        No KEM key pair generated yet.
+                    </div>
+                    <div id="kemKeyPairDetails" class="d-none">
+                        <div class="mb-3">
+                            <label class="form-label">Private Key</label>
+                            <textarea class="form-control" id="kemPrivateKey" rows="3" readonly></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Public Key</label>
+                            <textarea class="form-control" id="kemPublicKey" rows="3" readonly></textarea>
+                        </div>
+                        <table class="table">
+                            <tr>
+                                <th>Scheme</th>
+                                <td id="kemPairScheme"></td>
+                            </tr>
+                            <tr>
+                                <th>Hash Algorithm</th>
+                                <td id="kemPairHash"></td>
+                            </tr>
+                            <tr>
+                                <th>Security Level</th>
+                                <td id="kemPairSecurityLevel"></td>
+                            </tr>
+                            <tr>
+                                <th>Generation Time</th>
+                                <td id="kemPairTime"></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Encapsulate Shared Secret</h5>
+                </div>
+                <div class="card-body">
+                    <form id="encapsulateForm">
+                        <div class="mb-3">
+                            <label for="encapPublicKey" class="form-label">Public Key</label>
+                            <textarea class="form-control" id="encapPublicKey" rows="3" required></textarea>
+                            <small class="form-text text-muted">Use the public key generated above or paste your own.</small>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="encapScheme" class="form-label">KEM Scheme</label>
+                                    <select class="form-select" id="encapScheme">
+                                        <option value="kyber" selected>Kyber</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="encapHashAlgo" class="form-label">Hash Algorithm</label>
+                                    <select class="form-select" id="encapHashAlgo">
+                                        <option value="improved" selected>Improved</option>
+                                        <option value="grover">Grover</option>
+                                        <option value="shor">Shor</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="encapSecurityLevel" class="form-label">Security Level</label>
+                                    <select class="form-select" id="encapSecurityLevel">
+                                        <option value="1">1 (Kyber-512)</option>
+                                        <option value="3">3 (Kyber-768)</option>
+                                        <option value="5">5 (Kyber-1024)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Encapsulate Shared Secret</button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Encapsulation Result</h5>
+                </div>
+                <div class="card-body">
+                    <div id="encapsulateResult" class="alert alert-light">
+                        No encapsulation performed yet.
+                    </div>
+                    <div id="encapsulateDetails" class="d-none">
+                        <div class="mb-3">
+                            <label class="form-label">Ciphertext</label>
+                            <textarea class="form-control" id="ciphertext" rows="3" readonly></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Shared Secret</label>
+                            <textarea class="form-control" id="sharedSecret" rows="2" readonly></textarea>
+                        </div>
+                        <table class="table">
+                            <tr>
+                                <th>Scheme</th>
+                                <td id="encapSchemeResult"></td>
+                            </tr>
+                            <tr>
+                                <th>Ciphertext Size</th>
+                                <td id="ciphertextSizeResult"></td>
+                            </tr>
+                            <tr>
+                                <th>Encapsulation Time</th>
+                                <td id="encapTimeResult"></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Decapsulate Shared Secret</h5>
+                </div>
+                <div class="card-body">
+                    <form id="decapsulateForm">
+                        <div class="mb-3">
+                            <label for="decapCiphertext" class="form-label">Ciphertext</label>
+                            <textarea class="form-control" id="decapCiphertext" rows="3" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="decapPrivateKey" class="form-label">Private Key</label>
+                            <textarea class="form-control" id="decapPrivateKey" rows="3" required></textarea>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="decapScheme" class="form-label">KEM Scheme</label>
+                                    <select class="form-select" id="decapScheme">
+                                        <option value="kyber" selected>Kyber</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="decapHashAlgo" class="form-label">Hash Algorithm</label>
+                                    <select class="form-select" id="decapHashAlgo">
+                                        <option value="improved" selected>Improved</option>
+                                        <option value="grover">Grover</option>
+                                        <option value="shor">Shor</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="decapSecurityLevel" class="form-label">Security Level</label>
+                                    <select class="form-select" id="decapSecurityLevel">
+                                        <option value="1">1 (Kyber-512)</option>
+                                        <option value="3">3 (Kyber-768)</option>
+                                        <option value="5">5 (Kyber-1024)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Decapsulate Shared Secret</button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h5>Decapsulation Result</h5>
+                </div>
+                <div class="card-body">
+                    <div id="decapsulateResult" class="alert alert-light">
+                        No decapsulation performed yet.
+                    </div>
+                    <div id="decapsulateDetails" class="d-none">
+                        <div class="mb-3">
+                            <label class="form-label">Shared Secret</label>
+                            <textarea class="form-control" id="decapSharedSecret" rows="2" readonly></textarea>
+                        </div>
+                        <table class="table">
+                            <tr>
+                                <th>Scheme</th>
+                                <td id="decapSchemeResult"></td>
+                            </tr>
+                            <tr>
+                                <th>Decapsulation Time</th>
+                                <td id="decapTimeResult"></td>
+                            </tr>
+                        </table>
+                        <div id="secretMatch" class="alert alert-info mt-3">
+                            Compare this shared secret with the one from encapsulation to verify they match.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-white text-center py-3 mt-5">
+        <div class="container">
+            <p class="mb-0">Dirac Hashes - Quantum-Inspired Cryptography Library</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html> 
