@@ -1,0 +1,67 @@
+Metadata-Version: 2.4
+Name: dirac-hashes
+Version: 0.1.0
+Summary: Quantum-inspired hash functions and key generation for blockchain
+Home-page: https://github.com/yourusername/dirac-hashes
+Author: Quantum Hash Team
+Author-email: example@example.com
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: Topic :: Security :: Cryptography
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+Requires-Dist: numpy>=1.20.0
+Requires-Dist: scipy>=1.7.0
+Requires-Dist: qiskit>=0.34.0
+Requires-Dist: matplotlib>=3.4.0
+Requires-Dist: cryptography>=3.4.8
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
+# Dirac Hashes
+
+Quantum-inspired hash functions and key generation algorithms for blockchain applications.
+
+## Overview
+
+This project implements quantum-inspired cryptographic algorithms designed to be resistant to quantum computing attacks. The library provides hash functions and key generation tools that can be integrated with Web3 applications, particularly Solana-based dApps.
+
+### Features
+
+- Quantum-inspired hash functions
+- Enhanced entropy for key generation
+- Post-quantum signature algorithms
+- Solana wallet integration (upcoming)
+
+## Installation
+
+```bash
+# Create and activate virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+```
+
+## Usage
+
+Documentation coming soon.
+
+## Development
+
+This project is under active development.
+
+## License
+
+MIT
