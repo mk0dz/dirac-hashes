@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: dirac-hashes-api
+    env: docker
+    repo: https://github.com/yourusername/dirac-hashes
+    dockerfilePath: ./Dockerfile
+    dockerCommand: python run_api.py
+    envVars:
+      - key: PORT
+        value: 8000
+    autoDeploy: true
+    healthCheckPath: /api/hash/algorithms 
