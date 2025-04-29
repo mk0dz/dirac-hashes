@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    command: ["python", "run_api.py"]
+    volumes:
+      - ./src:/app/src
+      - ./api:/app/api
+    restart: unless-stopped
+    networks:
+      - dirac-network
+
+  frontend:
+    build: .
+    ports:
+      - "8080:8080"
+    command: ["python", "serve_frontend.py"]
+    volumes:
+      - ./frontend:/app/frontend
+    depends_on:
+      - api
+    restart: unless-stopped
+    networks:
+      - dirac-network
+
+networks:
+  dirac-network:
+    driver: bridge 

@@ -8,7 +8,7 @@ from fastapi import APIRouter, HTTPException, Body
 from typing import Dict, Any, List
 import base64
 
-from src.quantum_hash.signatures.kyber import KyberKEM
+from src.quantum_hash.kem.kyber import Kyber as KyberKEM
 
 from api.models.kem_models import (
     KEMScheme,
@@ -95,9 +95,25 @@ async def encapsulate_key(request: EncapsulateRequest):
             seed = key_bytes[:32]
             t_bytes = key_bytes[32:]
             
-            # Create t list with proper length for Kyber
-            t_len = len(t_bytes) // request.security_level
-            t = [t_bytes[i:i+t_len] for i in range(0, len(t_bytes), t_len)]
+            # In a typical KYBER implementation, 't' is an array of polynomial byte representations
+            # The polynomial size depends on n = 256 and each coefficient is 2 bytes
+            # So each polynomial is 512 bytes
+            bytes_per_poly = 256 * 2  # 2 bytes per coefficient, 256 coefficients
+            
+            # Extract all available polynomials from t_bytes
+            t = []
+            num_polys = len(t_bytes) // bytes_per_poly
+            for i in range(num_polys):
+                start = i * bytes_per_poly
+                end = start + bytes_per_poly
+                if end <= len(t_bytes):
+                    t.append(t_bytes[start:end])
+            
+            if not t:
+                raise HTTPException(
+                    status_code=400, 
+                    detail=f"Invalid public key format: could not extract any polynomials from t_bytes (length {len(t_bytes)})"
+                )
             
             public_key = {
                 'seed': seed,
@@ -146,9 +162,25 @@ async def decapsulate_key(request: DecapsulateRequest):
             seed = key_bytes[:32]
             s_bytes = key_bytes[32:]
             
-            # Create s list with proper length for Kyber
-            s_len = len(s_bytes) // request.security_level
-            s = [s_bytes[i:i+s_len] for i in range(0, len(s_bytes), s_len)]
+            # In a typical KYBER implementation, 's' is an array of polynomial byte representations
+            # The polynomial size depends on n = 256 and each coefficient is 2 bytes
+            # So each polynomial is 512 bytes
+            bytes_per_poly = 256 * 2  # 2 bytes per coefficient, 256 coefficients
+            
+            # Extract all available polynomials from s_bytes
+            s = []
+            num_polys = len(s_bytes) // bytes_per_poly
+            for i in range(num_polys):
+                start = i * bytes_per_poly
+                end = start + bytes_per_poly
+                if end <= len(s_bytes):
+                    s.append(s_bytes[start:end])
+            
+            if not s:
+                raise HTTPException(
+                    status_code=400, 
+                    detail=f"Invalid private key format: could not extract any polynomials from s_bytes (length {len(s_bytes)})"
+                )
             
             private_key = {
                 'seed': seed,

@@ -63,22 +63,37 @@ async def generate_keypair(request: KeyPairRequest):
         public_key_formatted = ""
         
         if request.scheme == SignatureScheme.LAMPORT:
+            # For Lamport, serialize the dictionary structure
+            private_key_bytes = []
+            public_key_bytes = []
+            
+            # Each key entry is a dictionary with sk/pk
+            for i in range(len(private_key)):
+                private_key_bytes.append(private_key[i]['sk'])
+                public_key_bytes.append(public_key[i]['pk'])
+            
             private_key_formatted = binascii.hexlify(
-                b''.join([key for key in private_key])
+                b''.join(private_key_bytes)
             ).decode('ascii')
             public_key_formatted = binascii.hexlify(
-                b''.join([key for key in public_key])
+                b''.join(public_key_bytes)
             ).decode('ascii')
         elif request.scheme == SignatureScheme.SPHINCS:
-            private_key_formatted = binascii.hexlify(private_key).decode('ascii')
-            public_key_formatted = binascii.hexlify(public_key).decode('ascii')
+            # SPHINCS returns a dictionary structure
+            # Serialize seed, sk_seed, and prf_seed for private key
+            private_key_bytes = private_key['seed'] + private_key['sk_seed'] + private_key['prf_seed']
+            # Serialize seed and root for public key
+            public_key_bytes = public_key['seed'] + public_key['root']
+            
+            private_key_formatted = binascii.hexlify(private_key_bytes).decode('ascii')
+            public_key_formatted = binascii.hexlify(public_key_bytes).decode('ascii')
         elif request.scheme == SignatureScheme.DILITHIUM:
             # For Dilithium, we need to serialize the dictionary
             private_key_formatted = base64.b64encode(
-                binascii.hexlify(private_key['rho'] + b''.join(private_key['s']))
+                private_key['rho'] + b''.join(private_key['s'])
             ).decode('ascii')
             public_key_formatted = base64.b64encode(
-                binascii.hexlify(public_key['rho'] + b''.join(public_key['t']))
+                public_key['rho'] + b''.join(public_key['t'])
             ).decode('ascii')
         
         # Format response
@@ -115,20 +130,67 @@ async def sign_message(request: SignRequest):
         # Parse private key
         private_key = None
         if request.scheme == SignatureScheme.LAMPORT:
-            # TODO: Add proper key parsing for Lamport scheme
-            # This is a placeholder
+            # Parse the hex encoded key
             key_bytes = binascii.unhexlify(request.private_key)
-            # Properly parse the key into the required format for Lamport
-            private_key = [key_bytes[i:i+32] for i in range(0, len(key_bytes), 32)]
+            
+            # Determine the size of each key entry
+            key_entry_size = 32  # Each private key is 32 bytes
+            num_entries = len(key_bytes) // key_entry_size
+            
+            # Create the Lamport private key structure
+            private_key = []
+            for i in range(num_entries):
+                start = i * key_entry_size
+                end = start + key_entry_size
+                private_key.append({'sk': key_bytes[start:end]})
+                
         elif request.scheme == SignatureScheme.SPHINCS:
-            private_key = binascii.unhexlify(request.private_key)
+            # SPHINCS expects the private key as a dictionary
+            key_bytes = binascii.unhexlify(request.private_key)
+            
+            # Split into components (seed, sk_seed, prf_seed)
+            # Each is 32 bytes in our implementation
+            seed = key_bytes[:32]
+            sk_seed = key_bytes[32:64]
+            prf_seed = key_bytes[64:96]
+            
+            private_key = {
+                'seed': seed,
+                'sk_seed': sk_seed,
+                'prf_seed': prf_seed
+            }
+            
         elif request.scheme == SignatureScheme.DILITHIUM:
             # For Dilithium, parse the base64 encoded key
-            key_bytes = binascii.unhexlify(base64.b64decode(request.private_key))
+            key_bytes = base64.b64decode(request.private_key)
+            
+            # The private key contains rho followed by serialized 's' polynomials
             rho = key_bytes[:32]
             s_bytes = key_bytes[32:]
-            # Construct a simplified private key dictionary for testing
-            private_key = {'rho': rho, 's': [s_bytes], 'test_message': message_bytes}
+            
+            # Split s_bytes into proper elements (for Dilithium level 1, we need 2 elements)
+            # Each polynomial is 1024 bytes (256 coefficients, 4 bytes each)
+            polynomial_size = 1024
+            s_elements = []
+            
+            # Split s_bytes into chunks of polynomial_size
+            num_elements = len(s_bytes) // polynomial_size
+            for i in range(num_elements):
+                start = i * polynomial_size
+                end = start + polynomial_size
+                s_elements.append(s_bytes[start:end])
+            
+            # Generate deterministic sigma from rho for testing purposes
+            sigma = rho  # In production, this would be a different value
+            
+            # Create simplified private key with required fields
+            private_key = {
+                'rho': rho,
+                'sigma': sigma,
+                's': s_elements,
+                'e': s_elements,  # Use s_elements as placeholder for 'e'
+                't': s_elements   # Use s_elements as placeholder for 't'
+            }
         
         # Sign message
         start_time = time.time()
@@ -138,11 +200,19 @@ async def sign_message(request: SignRequest):
         # Format signature for response
         signature_formatted = ""
         if request.scheme == SignatureScheme.LAMPORT:
-            signature_formatted = binascii.hexlify(
-                b''.join([sig for sig in signature])
-            ).decode('ascii')
+            signature_bytes = b''.join(signature)
+            signature_formatted = binascii.hexlify(signature_bytes).decode('ascii')
+            
         elif request.scheme == SignatureScheme.SPHINCS:
-            signature_formatted = binascii.hexlify(signature).decode('ascii')
+            # For SPHINCS, the signature is a dictionary
+            if isinstance(signature, dict):
+                # Serialize the R, root, and path components
+                signature_bytes = signature['R'] + signature['root'] + signature['path']
+                signature_formatted = binascii.hexlify(signature_bytes).decode('ascii')
+            else:
+                # Fall back to direct hex encoding if not a dict
+                signature_formatted = binascii.hexlify(signature).decode('ascii')
+                
         elif request.scheme == SignatureScheme.DILITHIUM:
             # For Dilithium, serialize the dictionary
             c_bytes = signature['c']
@@ -152,9 +222,9 @@ async def sign_message(request: SignRequest):
         # Get signature size
         signature_size = 0
         if request.scheme == SignatureScheme.LAMPORT:
-            signature_size = sum(len(sig) for sig in signature)
+            signature_size = len(signature_bytes)
         elif request.scheme == SignatureScheme.SPHINCS:
-            signature_size = len(signature)
+            signature_size = len(signature_bytes) if 'signature_bytes' in locals() else len(signature)
         elif request.scheme == SignatureScheme.DILITHIUM:
             signature_size = len(c_bytes) + len(z_bytes)
         
@@ -194,34 +264,105 @@ async def verify_signature(request: VerifyRequest):
         public_key = None
         
         if request.scheme == SignatureScheme.LAMPORT:
-            # TODO: Add proper signature and key parsing for Lamport scheme
-            # This is a placeholder
+            # Parse the hex encoded signature
             sig_bytes = binascii.unhexlify(request.signature)
-            # Properly parse the signature into the required format for Lamport
-            signature = [sig_bytes[i:i+32] for i in range(0, len(sig_bytes), 32)]
             
+            # Determine the size of each signature entry
+            sig_entry_size = 32  # Each signature part is 32 bytes
+            signature = []
+            for i in range(len(sig_bytes) // sig_entry_size):
+                start = i * sig_entry_size
+                end = start + sig_entry_size
+                signature.append(sig_bytes[start:end])
+            
+            # Parse the hex encoded public key
             key_bytes = binascii.unhexlify(request.public_key)
-            # Properly parse the key into the required format for Lamport
-            public_key = [key_bytes[i:i+32] for i in range(0, len(key_bytes), 32)]
+            
+            # Create the Lamport public key structure
+            key_entry_size = 32  # Each public key is 32 bytes
+            public_key = []
+            for i in range(len(key_bytes) // key_entry_size):
+                start = i * key_entry_size
+                end = start + key_entry_size
+                public_key.append({'pk': key_bytes[start:end]})
+                
         elif request.scheme == SignatureScheme.SPHINCS:
-            signature = binascii.unhexlify(request.signature)
-            public_key = binascii.unhexlify(request.public_key)
+            # Parse the hex encoded signature
+            sig_bytes = binascii.unhexlify(request.signature)
+            
+            # For SPHINCS, the signature is a dictionary with R, root, and path
+            # R and root are 32 bytes each, path length depends on parameters
+            R = sig_bytes[:32]
+            root = sig_bytes[32:64]
+            path = sig_bytes[64:]
+            
+            signature = {
+                'R': R,
+                'root': root,
+                'path': path
+            }
+            
+            # Parse the hex encoded public key
+            key_bytes = binascii.unhexlify(request.public_key)
+            
+            # Split into components (seed, root)
+            seed = key_bytes[:32]
+            root = key_bytes[32:64]
+            
+            public_key = {
+                'seed': seed,
+                'root': root
+            }
+            
         elif request.scheme == SignatureScheme.DILITHIUM:
             # For Dilithium, parse the base64 encoded signature and key
-            sig_bytes = binascii.unhexlify(base64.b64decode(request.signature))
-            c_bytes = sig_bytes[:1024]  # Assuming fixed size for c
-            z_bytes = sig_bytes[1024:]
-            # Simplified signature dictionary for testing
+            sig_bytes = base64.b64decode(request.signature)
+            
+            # Split signature into c and z parts
+            # The c part is typically much smaller than the z part
+            c_bytes_size = 256  # Fixed size estimate for c
+            c_bytes = sig_bytes[:c_bytes_size]
+            z_bytes = sig_bytes[c_bytes_size:]
+            
+            # Split z_bytes into chunks for Dilithium level 1
+            polynomial_size = 1024
+            z_elements = []
+            
+            # For Dilithium level 1, split into 2 elements
+            num_elements = max(2, len(z_bytes) // polynomial_size)
+            for i in range(num_elements):
+                start = i * polynomial_size
+                end = min(start + polynomial_size, len(z_bytes))
+                if start < len(z_bytes):
+                    z_elements.append(z_bytes[start:end])
+            
+            # Create signature dictionary with the expected fields
             signature = {
                 'c': c_bytes,
-                'z': [z_bytes],
+                'z': z_elements,
+                'h': [],  # Empty hints for simplified verification
                 'test_message': message_bytes  # For our simplified implementation
             }
             
-            key_bytes = binascii.unhexlify(base64.b64decode(request.public_key))
+            # Parse the public key
+            key_bytes = base64.b64decode(request.public_key)
             rho = key_bytes[:32]
             t_bytes = key_bytes[32:]
-            public_key = {'rho': rho, 't': [t_bytes]}
+            
+            # Split t_bytes into chunks
+            t_elements = []
+            num_elements = len(t_bytes) // polynomial_size
+            for i in range(num_elements):
+                start = i * polynomial_size
+                end = start + polynomial_size
+                if end <= len(t_bytes):
+                    t_elements.append(t_bytes[start:end])
+            
+            # Create public key dictionary
+            public_key = {
+                'rho': rho,
+                't': t_elements
+            }
         
         # Verify signature
         start_time = time.time()

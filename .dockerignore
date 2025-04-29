@@ -1,0 +1,44 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+venv/
+
+# Tests and debug
+tests/
+debug_*.py
+*_test.py
+test_*.py
+
+# Editor directories and files
+.idea
+.vscode
+*.swp
+*.swo
+.cursor
+
+# Benchmarks and examples
+benchmark_results/
+benchmark.py
+demo.py 
