@@ -1,0 +1,24 @@
+{
+  "name": "dirac-hashes",
+  "version": "0.1.0",
+  "description": "A next-generation cryptographic hash library built for speed, security, and quantum resistance",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": [
+    "cryptography",
+    "hash",
+    "dirac",
+    "quantum",
+    "security"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "nodemon": "^2.0.22"
+  },
+  "dependencies": {
+  }
+} 

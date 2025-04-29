@@ -1,20 +1,290 @@
-/* Main styles for Dirac Hashes frontend */
+/* Modern, minimal styles for Dirac Hashes frontend */
+
+:root {
+    --primary: #000;
+    --secondary: #333;
+    --accent: #0066cc;
+    --light-bg: #f8f9fa;
+    --border-color: #e0e0e0;
+    --success: #28a745;
+    --error: #dc3545;
+}
 
 body {
-    background-color: #f8f9fa;
-    color: #343a40;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: white;
+    color: var(--primary);
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
 }
 
-.navbar-brand {
-    font-weight: bold;
+/* Header section */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 0;
+    border-bottom: 1px solid var(--border-color);
 }
 
+.header-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--primary);
+}
+
+.header-subtitle {
+    color: var(--secondary);
+    font-weight: 400;
+}
+
+/* Main layout */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+    margin: 2rem 0;
+}
+
+/* Hero section */
+.hero {
+    padding: 3rem 0;
+}
+
+.hero-title {
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.hero-tagline {
+    font-size: 1.4rem;
+    color: var(--secondary);
+    margin-bottom: 2rem;
+    line-height: 1.4;
+}
+
+/* Buttons */
+.btn {
+    display: inline-block;
+    background: var(--primary);
+    color: white;
+    padding: 0.6rem 1.5rem;
+    text-decoration: none;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.btn-outline {
+    background: transparent;
+    color: var(--primary);
+    border: 1px solid var(--primary);
+}
+
+.btn-outline:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.btn-group {
+    display: flex;
+    gap: 1rem;
+    margin: 2rem 0;
+}
+
+/* Content sections */
+.section {
+    margin: 4rem 0;
+}
+
+.section-title {
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+/* Card styling */
+.card {
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Graph containers */
+.graph {
+    background-color: var(--light-bg);
+    padding: 1rem;
+    border-radius: 5px;
+    height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+/* Form controls */
+.form-control {
+    display: block;
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    font-family: inherit;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+/* Tables for API status and results */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table th, .table td {
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--border-color);
+    text-align: left;
+}
+
+.table th {
+    font-weight: 600;
+    background-color: var(--light-bg);
+}
+
+/* Alert boxes */
+.alert {
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 4px;
+}
+
+.alert-success {
+    background-color: rgba(40, 167, 69, 0.1);
+    color: var(--success);
+    border: 1px solid rgba(40, 167, 69, 0.2);
+}
+
+.alert-error {
+    background-color: rgba(220, 53, 69, 0.1);
+    color: var(--error);
+    border: 1px solid rgba(220, 53, 69, 0.2);
+}
+
+.alert-info {
+    background-color: rgba(0, 102, 204, 0.1);
+    color: var(--accent);
+    border: 1px solid rgba(0, 102, 204, 0.2);
+}
+
+/* Code blocks */
+.code-block {
+    background-color: #f6f8fa;
+    border-radius: 5px;
+    padding: 1rem;
+    overflow-x: auto;
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    font-size: 0.9rem;
+    margin: 1.5rem 0;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .header-subtitle {
+        margin-top: 0.5rem;
+    }
+    
+    .btn-group {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .btn {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+/* Navigation */
+.nav {
+    display: flex;
+    gap: 1.5rem;
+    margin: 1rem 0;
+}
+
+.nav-link {
+    color: var(--secondary);
+    text-decoration: none;
+    font-weight: 500;
+    padding: 0.5rem 0;
+    position: relative;
+}
+
+.nav-link:hover {
+    color: var(--primary);
+}
+
+.nav-link.active {
+    color: var(--primary);
+}
+
+.nav-link.active:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: var(--primary);
+}
+
+/* Hide all pages by default */
 .page {
     display: none;
 }
 
+/* Show active page */
 .page.active {
     display: block;
+}
+
+/* Results formatting */
+.hash-result, .signature-result, .kem-result {
+    font-family: monospace;
+    word-break: break-all;
+    background-color: var(--light-bg);
+    padding: 1rem;
+    border-radius: 4px;
 }
 
 /* Card styling */
@@ -25,12 +295,6 @@ body {
 
 .card-header {
     background-color: #f1f8ff;
-}
-
-/* Form controls */
-.form-control:focus {
-    border-color: #80bdff;
-    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
 }
 
 /* Hash result display */
@@ -127,4 +391,135 @@ pre.code-block {
     margin-bottom: 5px;
     background: linear-gradient(to right, #007bff, #6f42c1);
     border-radius: 10px;
+}
+
+/* Hash Testing Page Styles */
+.hash-testing-container {
+    margin: 2rem 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+}
+
+.hash-testing-hero {
+    text-align: center;
+    padding: 3rem 0;
+    background-color: var(--light-bg);
+    border-radius: 8px;
+    margin-bottom: 2rem;
+}
+
+.hash-testing-section {
+    margin-bottom: 3rem;
+}
+
+.hash-input-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.hash-result-container {
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    padding: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.hash-result-box {
+    background-color: var(--light-bg);
+    padding: 1rem;
+    border-radius: 4px;
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    overflow-wrap: break-word;
+    margin-top: 1rem;
+    min-height: 3rem;
+}
+
+.algorithm-selector {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+}
+
+.algorithm-option {
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.algorithm-option:hover {
+    border-color: var(--accent);
+}
+
+.algorithm-option.selected {
+    background-color: var(--accent);
+    color: white;
+    border-color: var(--accent);
+}
+
+.hash-comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1.5rem;
+}
+
+.hash-comparison-table th, 
+.hash-comparison-table td {
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    text-align: left;
+}
+
+.hash-comparison-table th {
+    background-color: var(--light-bg);
+    font-weight: 600;
+}
+
+.hash-sidebar {
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    padding: 1.5rem;
+}
+
+.hash-sidebar h3 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+}
+
+.hash-sidebar ul {
+    padding-left: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.hash-sidebar li {
+    margin-bottom: 0.5rem;
+}
+
+.encoding-options {
+    margin: 1rem 0;
+}
+
+.input-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+/* Media queries for responsive hash testing page */
+@media (max-width: 768px) {
+    .hash-input-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .algorithm-selector {
+        flex-direction: column;
+    }
 } 
