@@ -86,7 +86,18 @@ async function checkEndpoints(endpoints) {
             // Extract the actual endpoint path from the description string
             const endpointPath = url.split(' ')[0]; 
             const startTime = performance.now();
-            const response = await fetch(`${API_URL}${endpointPath}/algorithms`);
+            
+            // Use the appropriate health check endpoint based on the API module
+            let checkUrl;
+            if (name === 'hash') {
+                checkUrl = `${API_URL}${endpointPath}/algorithms`;
+            } else if (name === 'signatures' || name === 'kem') {
+                checkUrl = `${API_URL}${endpointPath}/schemes`;
+            } else {
+                checkUrl = `${API_URL}${endpointPath}`;
+            }
+            
+            const response = await fetch(checkUrl);
             const endTime = performance.now();
             
             return {
