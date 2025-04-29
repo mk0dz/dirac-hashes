@@ -1,5 +1,7 @@
 // Configuration
-const API_URL = 'http://localhost:8000';
+const API_URL = window.location.hostname === 'localhost' 
+  ? 'http://localhost:8000' 
+  : 'https://dirac-hashes.onrender.com';
 
 // DOM Loaded
 document.addEventListener('DOMContentLoaded', function() {
