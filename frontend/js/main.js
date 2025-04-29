@@ -83,8 +83,10 @@ async function checkEndpoints(endpoints) {
     // Function to check a single endpoint
     async function checkEndpoint(name, url) {
         try {
+            // Extract the actual endpoint path from the description string
+            const endpointPath = url.split(' ')[0]; 
             const startTime = performance.now();
-            const response = await fetch(`${API_URL}${url.split(' ')[0]}`);
+            const response = await fetch(`${API_URL}${endpointPath}/algorithms`);
             const endTime = performance.now();
             
             return {
