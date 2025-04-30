@@ -9,11 +9,12 @@ can perform basic operations.
 import sys
 
 try:
+    import quantum_hash
     from quantum_hash.dirac import DiracHash
     from quantum_hash.signatures.dilithium import DilithiumSignature
     
     print("Dirac Hashes package is installed correctly!")
-    print(f"Version: {DiracHash.__version__}")
+    print(f"Version: {quantum_hash.__version__}")
     
     # Test basic hash functionality
     print("\nTesting hash functionality...")

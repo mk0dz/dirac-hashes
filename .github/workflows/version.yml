@@ -1,0 +1,56 @@
+name: Update Version
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  update-version:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    
+    - name: Extract version from tag
+      id: get_version
+      run: |
+        VERSION=${GITHUB_REF#refs/tags/v}
+        echo "VERSION=$VERSION" >> $GITHUB_ENV
+        echo "Version extracted: $VERSION"
+    
+    - name: Update version in setup.py
+      run: |
+        sed -i "s/version=\"[0-9]*\.[0-9]*\.[0-9]*\"/version=\"$VERSION\"/g" setup.py
+        echo "Updated version in setup.py to $VERSION"
+    
+    - name: Update version in __init__.py
+      run: |
+        echo "Updating version in src/quantum_hash/__init__.py"
+        if grep -q "__version__" src/quantum_hash/__init__.py; then
+          sed -i "s/__version__ = '[0-9]*\.[0-9]*\.[0-9]*'/__version__ = '$VERSION'/g" src/quantum_hash/__init__.py
+        else
+          echo "Adding __version__ attribute to __init__.py"
+          sed -i "/^__author__/a __version__ = '$VERSION'" src/quantum_hash/__init__.py
+        fi
+        cat src/quantum_hash/__init__.py
+    
+    - name: Commit version changes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add setup.py src/quantum_hash/__init__.py
+        git commit -m "Bump version to $VERSION"
+        
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: ${{ github.ref }} 
