@@ -23,7 +23,7 @@ function show_usage {
 # Build the Docker image
 function build_image {
   echo "Building Dirac Hashes Docker image..."
-  docker build -t dirac-hashes -f deployment/Dockerfile .
+  docker build -t dirac-hashes -f Dockerfile .
   echo "Build completed successfully."
 }
 

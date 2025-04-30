@@ -3,8 +3,8 @@ version: '3'
 services:
   dirac-hashes:
     build: 
-      context: ..
-      dockerfile: deployment/Dockerfile
+      context: .
+      dockerfile: Dockerfile
     ports:
       - "8000:8000"  # API port
       - "8080:8080"  # Frontend port
@@ -12,11 +12,11 @@ services:
       - PYTHONPATH=/app
       - PYTHONUNBUFFERED=1
     volumes:
-      - ../src:/app/src
-      - ../web:/app/web
-      - ../tools:/app/tools
-      - ../run_api_direct.py:/app/run_api_direct.py
-      - ../run_frontend_direct.py:/app/run_frontend_direct.py
+      - ./src:/app/src
+      - ./web:/app/web
+      - ./tools:/app/tools
+      - ./run_api_direct.py:/app/run_api_direct.py
+      - ./run_frontend_direct.py:/app/run_frontend_direct.py
     restart: unless-stopped
     networks:
       - dirac-network
