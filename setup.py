@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="dirac-hashes",
-    version="0.1.1",
+    version="0.1.2",
     author="mk0dz",
     author_email="Mukulpal108@hotmail.com",
     description="Quantum-resistant hash functions and post-quantum cryptography for blockchain",
