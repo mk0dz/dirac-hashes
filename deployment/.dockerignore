@@ -1,44 +1,56 @@
-# Git
+# Ignore version control files
 .git
 .gitignore
+.github
+.codecov.yml
 
-# Python
+# Ignore environment and cache directories
+env/
+venv/
+.venv/
+.env/
 __pycache__/
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
+.tox/
+.nox/
+.hypothesis/
+.mypy_cache/
+.ruff_cache/
+
+# Ignore build directories and files
+*.egg-info/
+dist/
+build/
 *.py[cod]
 *$py.class
 *.so
 .Python
-env/
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
+wheels/
+*.manifest
+*.spec
 .eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-*.egg-info/
-.installed.cfg
-*.egg
-venv/
 
-# Tests and debug
-tests/
-debug_*.py
-*_test.py
-test_*.py
+# Ignore benchmark and testing artifacts
+benchmark_results/
+.coverage*
+coverage.xml
+.pytest_cache/
 
-# Editor directories and files
-.idea
-.vscode
+# Ignore IDE specific files
+.idea/
+.vscode/
 *.swp
 *.swo
-.cursor
+.DS_Store
+.cursor/
 
-# Benchmarks and examples
-benchmark_results/
-benchmark.py
-demo.py 
+# Ignore docs and examples since they're not needed for runtime
+docs/
+examples/
+info/
+
+# Ignore deployment files except the ones we need
+deployment/README.md 
