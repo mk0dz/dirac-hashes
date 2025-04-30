@@ -177,42 +177,107 @@ def shor_hash(data: bytes, digest_size: int = 32) -> bytes:
     Returns:
         Hashed output as bytes
     """
-    # Convert input to numeric array
-    data_array = np.frombuffer(data, dtype=np.uint8)
+    # If data is empty, use a default value
+    if not data:
+        data = b"\x00"
     
-    # Initialize result array
-    result = bytearray(digest_size)
+    # Initialize result array with unique non-zero values
+    seed_hash = [
+        0x67, 0x45, 0x23, 0x01, 0xEF, 0xCD, 0xAB, 0x89,
+        0x98, 0xBA, 0xDC, 0xFE, 0x10, 0x32, 0x54, 0x76,
+        0xC3, 0xA5, 0x87, 0x69, 0x4B, 0x2D, 0x0F, 0xE1,
+        0xD2, 0xB4, 0x96, 0x78, 0x5A, 0x3C, 0x1E, 0x00
+    ]
     
-    # Process input in chunks
-    chunk_size = max(8, len(data_array) // 4)
-    chunks = [data_array[i:i+chunk_size] for i in range(0, len(data_array), chunk_size)]
+    # Ensure seed hash is at least digest_size
+    if len(seed_hash) < digest_size:
+        extended = []
+        for i in range(digest_size):
+            extended.append(seed_hash[i % len(seed_hash)] ^ i)
+        seed_hash = extended
     
-    # Initialize seed value
-    seed = 0x123456789abcdef  # Initial seed value
+    # Initialize state
+    result = bytearray(seed_hash[:digest_size])
     
-    for chunk in chunks:
-        # Convert chunk to a large integer
-        chunk_val = int.from_bytes(chunk, byteorder='big')
+    # Process input in blocks for better diffusion
+    block_size = 16  # Use 16-byte blocks
+    
+    # Pad data to multiple of block_size
+    padded_size = ((len(data) + block_size - 1) // block_size) * block_size
+    padded_data = bytearray(padded_size)
+    
+    # Copy data into padded array
+    for i in range(len(data)):
+        padded_data[i] = data[i]
+    
+    # Add data length at the end (prevent length extension)
+    length_bytes = len(data).to_bytes(8, byteorder='big')
+    for i in range(8):
+        if i < len(padded_data):
+            padded_data[padded_size - 8 + i] ^= length_bytes[i]
+    
+    # Initial value for state transformation
+    state_val = int.from_bytes(bytes(result), byteorder='big')
+    
+    # Process in blocks
+    for block_idx, block_start in enumerate(range(0, padded_size, block_size)):
+        block = padded_data[block_start:block_start+block_size]
         
-        # Apply Shor-inspired transformation (period finding and modular arithmetic)
-        a = (seed ^ chunk_val) % (2**64 - 1) + 1
-        N = (seed + chunk_val) % (2**64 - 1) + 1
+        # Convert block to a large integer for mathematical operations
+        block_val = int.from_bytes(block, byteorder='big')
         
-        # Find a period-like value
-        r = period_finding_classical(a % N, N, max_iterations=10) or 1
+        # Apply Shor-inspired transformation using modular arithmetic
+        # Different transformations for each block based on position
+        a = ((state_val ^ block_val) % (2**64 - 1)) + 1
+        N = ((state_val + block_val + block_idx) % (2**64 - 1)) + 1
         
-        # Apply quantum-inspired transformation
-        seed = (seed + a * r) % (2**64)
+        # Find period-like values more effectively
+        r1 = period_finding_classical(a % N, N, max_iterations=20) or (17 + block_idx % 11)
+        r2 = period_finding_classical((a * a) % N, N, max_iterations=20) or (13 + block_idx % 7)
         
-        # Update result using the new seed
-        for i in range(min(8, digest_size)):
-            idx = i % digest_size
-            result[idx] ^= (seed >> (8 * (i % 8))) & 0xFF
+        # Apply multiple mixing transformations for better diffusion
+        state_val = (state_val + a * r1) % (2**256)
+        state_val = (state_val ^ (state_val >> r2)) % (2**256)
+        state_val = (state_val + (state_val << (r1 % 21))) % (2**256)
+        
+        # Update result with block position influence
+        state_bytes = state_val.to_bytes(max(32, digest_size), byteorder='big')[-digest_size:]
+        
+        # Update different parts of result based on block position
+        for i in range(digest_size):
+            # Use block index to vary the update pattern
+            pos = (i + block_idx) % digest_size
+            result[pos] = (result[pos] + state_bytes[i] + i + block_idx) % 256
     
-    # Final diffusion pass
+    # Additional mixing with positional dependencies
     for i in range(digest_size):
-        idx1 = (i + 1) % digest_size
-        idx2 = (i + 7) % digest_size
-        result[i] = (result[i] + result[idx1] * result[idx2]) % 256
+        for j in range(3):  # Multiple passes
+            pos1 = (i + j*7) % digest_size
+            pos2 = (i + j*11) % digest_size
+            result[i] = (result[i] + result[pos1] ^ result[pos2]) % 256
     
+    # Final diffusion to ensure good avalanche effect and no repeating patterns
+    temp = bytearray(result)
+    for i in range(digest_size):
+        # Create unique transformations for each position
+        idx1 = (i + 1) % digest_size
+        idx2 = (i + digest_size // 2) % digest_size
+        idx3 = (i * 7 + 3) % digest_size
+        
+        # Combine bytes in different ways for each position
+        v1 = temp[i] 
+        v2 = temp[idx1]
+        v3 = temp[idx2]
+        v4 = temp[idx3]
+        
+        # Position-dependent transformation
+        if i % 4 == 0:
+            result[i] = (v1 + v2 + v3) % 256
+        elif i % 4 == 1:
+            result[i] = (v1 ^ v2 ^ v4) % 256
+        elif i % 4 == 2:
+            result[i] = (v1 + v3 ^ v4) % 256
+        else:
+            result[i] = (v1 ^ v3 + v2 + v4) % 256
+            
     return bytes(result) 
