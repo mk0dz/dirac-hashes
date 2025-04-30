@@ -18,8 +18,8 @@ document.addEventListener('DOMContentLoaded', function() {
     initKemPage();
 });
 
-// Global API URL
-const API_URL = 'http://localhost:8000';
+// Global API URL - change this to your deployed API URL
+const API_URL = 'https://dirac-hashes-api.onrender.com';
 
 // Page Navigation
 function setupNavigation() {
@@ -64,29 +64,43 @@ function initStatsPage() {
     createSecurityChart();
     
     // Set up periodic API status update
-    setInterval(updateApiStatusDisplay, 10000);
+    setInterval(checkApiStatus, 10000);
 }
 
 // Check API Status
 function checkApiStatus() {
-    fetch(`${API_URL}/`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('API is offline');
-            }
-            return response.json();
-        })
-        .then(data => {
-            updateApiStatusDisplay(true, data);
-        })
-        .catch(error => {
-            console.error('API Status Error:', error);
-            updateApiStatusDisplay(false);
-        });
+    const startTime = Date.now();
+    
+    fetch(`${API_URL}/`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+        },
+        mode: 'cors',
+        cache: 'no-cache',
+        timeout: 5000
+    })
+    .then(response => {
+        const endTime = Date.now();
+        const responseTime = endTime - startTime;
+        
+        if (!response.ok) {
+            throw new Error('API is offline');
+        }
+        return response.json().then(data => ({ data, responseTime }));
+    })
+    .then(({ data, responseTime }) => {
+        updateApiStatusDisplay(true, responseTime);
+        checkEndpointStatuses();
+    })
+    .catch(error => {
+        console.error('API Status Error:', error);
+        updateApiStatusDisplay(false);
+    });
 }
 
 // Update API Status Display
-function updateApiStatusDisplay(isOnline = true, data = null) {
+function updateApiStatusDisplay(isOnline = false, responseTime = null) {
     const statusElement = document.getElementById('api-status');
     const statusIndicator = document.getElementById('status-indicator');
     const responseTimeElement = document.getElementById('response-time');
@@ -97,26 +111,31 @@ function updateApiStatusDisplay(isOnline = true, data = null) {
             statusElement.textContent = 'Online';
             
             // If we have performance data, update the response time
-            if (data && responseTimeElement) {
-                // Simulate a response time between 200-500ms
-                const responseTime = Math.floor(Math.random() * 300) + 200;
+            if (responseTime && responseTimeElement) {
                 responseTimeElement.textContent = `${responseTime}ms`;
             }
-            
-            // Update endpoint statuses
-            updateEndpointStatuses();
         } else {
             statusIndicator.className = 'status-indicator status-offline';
             statusElement.textContent = 'Offline';
             if (responseTimeElement) {
                 responseTimeElement.textContent = 'N/A';
             }
+            
+            // Clear endpoint statuses
+            const endpoints = ['hash', 'signatures', 'kem'];
+            endpoints.forEach(endpoint => {
+                const statusElement = document.getElementById(`${endpoint}-status`);
+                const responseTimeElement = document.getElementById(`${endpoint}-response-time`);
+                
+                if (statusElement) statusElement.textContent = 'Offline';
+                if (responseTimeElement) responseTimeElement.textContent = 'N/A';
+            });
         }
     }
 }
 
-// Update Endpoint Statuses
-function updateEndpointStatuses() {
+// Check individual endpoint statuses
+function checkEndpointStatuses() {
     const endpoints = [
         { name: 'hash', path: '/api/hash/info' },
         { name: 'signatures', path: '/api/signatures/keypair' },
@@ -128,18 +147,33 @@ function updateEndpointStatuses() {
         const responseTimeElement = document.getElementById(`${endpoint.name}-response-time`);
         
         if (statusElement && responseTimeElement) {
-            // For demo purposes, randomly set some endpoints as available/unavailable
-            const isAvailable = Math.random() > 0.1; // 90% chance of being available
+            const startTime = Date.now();
             
-            statusElement.textContent = isAvailable ? 'Available' : 'Unavailable';
-            
-            if (isAvailable) {
-                // Generate a random response time between 200-1000ms
-                const responseTime = Math.floor(Math.random() * 800) + 200;
+            fetch(`${API_URL}${endpoint.path}`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                },
+                mode: 'cors',
+                cache: 'no-cache',
+                timeout: 5000
+            })
+            .then(response => {
+                const endTime = Date.now();
+                const responseTime = endTime - startTime;
+                
+                if (!response.ok) {
+                    throw new Error(`${endpoint.name} endpoint is unavailable`);
+                }
+                
+                statusElement.textContent = 'Available';
                 responseTimeElement.textContent = `${responseTime.toFixed(2)} ms`;
-            } else {
+            })
+            .catch(error => {
+                console.error(`Endpoint Error (${endpoint.name}):`, error);
+                statusElement.textContent = 'Unavailable';
                 responseTimeElement.textContent = 'N/A';
-            }
+            });
         }
     });
 }
