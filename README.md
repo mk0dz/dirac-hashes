@@ -1,6 +1,6 @@
 # Dirac Hashes
 
-[![Test](https://github.com/yourusername/dirac-hashes/actions/workflows/test.yml/badge.svg)](https://github.com/yourusername/dirac-hashes/actions/workflows/test.yml)
+[![Test](https://github.com/mk0dz/dirac-hashes/actions/workflows/test.yml/badge.svg)](https://github.com/mk0dz/dirac-hashes/actions/workflows/test.yml)
 [![PyPI version](https://badge.fury.io/py/dirac-hashes.svg)](https://badge.fury.io/py/dirac-hashes)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -38,10 +38,16 @@ Install the package from PyPI:
 pip install dirac-hashes
 ```
 
+Install directly from GitHub:
+
+```bash
+pip install git+https://github.com/mk0dz/dirac-hashes.git
+```
+
 Or install from source:
 
 ```bash
-git clone https://github.com/your-username/dirac-hashes.git
+git clone https://github.com/mk0dz/dirac-hashes.git
 cd dirac-hashes
 pip install -e .
 ```

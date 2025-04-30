@@ -1,0 +1,37 @@
+[build-system]
+requires = [
+    "setuptools>=42",
+    "wheel",
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dirac-hashes"
+authors = [
+    {name = "mk0dz", email = "Mukulpal108@hotmail.com"},
+]
+description = "Quantum-resistant hash functions and post-quantum cryptography for blockchain"
+readme = "README.md"
+requires-python = ">=3.7"
+keywords = ["quantum", "cryptography", "hash", "signatures", "blockchain"]
+license = {text = "MIT"}
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Topic :: Security :: Cryptography",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dynamic = ["version"]
+
+[project.urls]
+Homepage = "https://github.com/mk0dz/dirac-hashes"
+Documentation = "https://dirac-hashes.vercel.app/"
+Repository = "https://github.com/mk0dz/dirac-hashes.git"
+"Bug Tracker" = "https://github.com/mk0dz/dirac-hashes/issues" 

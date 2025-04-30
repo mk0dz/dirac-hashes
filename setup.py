@@ -11,10 +11,11 @@ setup(
     description="Quantum-resistant hash functions and post-quantum cryptography for blockchain",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/yourusername/dirac-hashes",
+    url="https://github.com/mk0dz/dirac-hashes",
     project_urls={
-        "Bug Tracker": "https://github.com/yourusername/dirac-hashes/issues",
+        "Bug Tracker": "https://github.com/mk0dz/dirac-hashes/issues",
         "Documentation": "https://dirac-hashes.vercel.app/",
+        "Source Code": "https://github.com/mk0dz/dirac-hashes",
     },
     package_dir={"": "src"},
     packages=find_packages(where="src"),
