@@ -48,25 +48,20 @@ def quantum_hash(data: Union[bytes, str], algorithm: str = 'hybrid',
     
     # Use optimized implementations if available and requested
     if optimized and _HAVE_OPTIMIZED:
-        if algorithm.lower() in ('optimized_grover', 'opt_grover'):
+        if algorithm.lower() in ('optimized_grover', 'opt_grover', 'improved_grover'):
             return optimized_grover_hash(data, digest_size)
-        elif algorithm.lower() in ('optimized_shor', 'opt_shor'):
+        elif algorithm.lower() in ('optimized_shor', 'opt_shor', 'improved_shor'):
             return optimized_shor_hash(data, digest_size)
-        elif algorithm.lower() in ('optimized', 'opt'):
-            return optimized_hybrid_hash(data, digest_size)
-        elif algorithm.lower() == 'improved_grover':
-            return optimized_grover_hash(data, digest_size)
-        elif algorithm.lower() == 'improved_shor':
-            return optimized_shor_hash(data, digest_size)
-        elif algorithm.lower() == 'improved':
+        elif algorithm.lower() in ('optimized', 'opt', 'improved'):
             return optimized_hybrid_hash(data, digest_size)
     
     # Non-optimized implementations
-    if algorithm.lower() == 'grover':
+    algorithm = algorithm.lower()
+    if algorithm == 'grover':
         return grover_hash(data, digest_size)
-    elif algorithm.lower() == 'shor':
+    elif algorithm == 'shor':
         return shor_hash(data, digest_size)
-    elif algorithm.lower() == 'hybrid':
+    elif algorithm == 'hybrid':
         # Hybrid approach: combine both algorithms
         # Use deterministic versions by seeding with the data
         
@@ -83,15 +78,15 @@ def quantum_hash(data: Union[bytes, str], algorithm: str = 'hybrid',
             result[i] = hash1[i] ^ hash2[i]
         
         return bytes(result)
-    elif algorithm.lower() == 'improved_grover':
+    elif algorithm == 'improved_grover':
         return improved_grover_hash(data, digest_size)
-    elif algorithm.lower() == 'improved_shor':
+    elif algorithm == 'improved_shor':
         return improved_shor_hash(data, digest_size)
-    elif algorithm.lower() == 'improved':
+    elif algorithm == 'improved':
         return improved_hybrid_hash(data, digest_size)
-    elif algorithm.lower() in ('optimized_grover', 'opt_grover', 
-                              'optimized_shor', 'opt_shor',
-                              'optimized', 'opt'):
+    elif algorithm in ('optimized_grover', 'opt_grover', 
+                     'optimized_shor', 'opt_shor',
+                     'optimized', 'opt'):
         raise ValueError(f"Optimized algorithm {algorithm} requested but not available")
     else:
         raise ValueError(f"Unknown algorithm: {algorithm}")
