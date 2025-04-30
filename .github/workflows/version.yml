@@ -22,6 +22,18 @@ jobs:
       with:
         python-version: '3.10'
     
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        # Install explicit dependencies first
+        pip install numpy scipy qiskit matplotlib cryptography pydantic python-multipart
+        # Then install the package
+        pip install -e .
+        
+    - name: List installed packages
+      run: |
+        pip list
+    
     - name: Extract version from tag
       id: get_version
       run: |
