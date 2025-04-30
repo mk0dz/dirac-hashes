@@ -16,6 +16,7 @@ jobs:
     - uses: actions/checkout@v3
       with:
         fetch-depth: 0
+        token: ${{ secrets.GH_PAT }}  # Use a personal access token with repo permissions
     
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -64,8 +65,7 @@ jobs:
         git add setup.py src/quantum_hash/__init__.py
         git commit -m "Bump version to $VERSION"
         
-    - name: Push changes
-      uses: ad-m/github-push-action@master
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        branch: ${{ github.ref_name }} 
+    - name: Push changes directly
+      run: |
+        # Push directly to main branch 
+        git push "https://${{ secrets.GH_PAT }}@github.com/mk0dz/dirac-hashes.git" HEAD:main 
