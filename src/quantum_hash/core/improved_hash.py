@@ -53,6 +53,9 @@ def improved_grover_hash(data: bytes, digest_size: int = 32) -> bytes:
     Returns:
         Hashed output as bytes
     """
+    # Add algorithm-specific identifier by prepending a byte
+    data = b'grover:' + data
+    
     # Convert input to numeric array
     data_array = np.frombuffer(data, dtype=np.uint8)
     
@@ -135,6 +138,9 @@ def improved_shor_hash(data: bytes, digest_size: int = 32) -> bytes:
     Returns:
         Hashed output as bytes
     """
+    # Add algorithm-specific identifier by prepending a byte
+    data = b'shor:' + data
+    
     # If data is empty, use a default value
     if not data:
         data = b"\x00"
@@ -211,8 +217,8 @@ def improved_shor_hash(data: bytes, digest_size: int = 32) -> bytes:
 
 def improved_hybrid_hash(data: bytes, digest_size: int = 32) -> bytes:
     """
-    Improved hybrid hash combining Grover and Shor approaches with
-    enhanced security properties.
+    Improved hybrid hash function combining multiple quantum-inspired
+    approaches for better security and performance.
     
     Args:
         data: Input data to hash
@@ -221,7 +227,10 @@ def improved_hybrid_hash(data: bytes, digest_size: int = 32) -> bytes:
     Returns:
         Hashed output as bytes
     """
-    # If empty data, use a default value
+    # Add algorithm-specific identifier by prepending a byte
+    data = b'improved:' + data
+    
+    # If data is empty, use a default value
     if not data:
         data = b"\x00"
     

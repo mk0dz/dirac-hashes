@@ -177,6 +177,11 @@ def shor_hash(data: bytes, digest_size: int = 32) -> bytes:
     Returns:
         Hashed output as bytes
     """
+    # Add algorithm-specific identifier by prepending a byte
+    # only if it's not already tagged (to avoid double tagging from improved_shor_hash)
+    if not data.startswith(b'shor:'):
+        data = b'shor:' + data
+        
     # If data is empty, use a default value
     if not data:
         data = b"\x00"

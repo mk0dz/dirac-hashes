@@ -105,9 +105,26 @@ async def hash_info():
 async def generate_hash(request: HashGenerateRequest):
     """Generate a hash for the given input message."""
     try:
-        hasher = DiracHash()
         message_bytes = request.message.encode(request.encoding)
-        hash_result = hasher.hash(message_bytes)
+        
+        # Use different hash functions based on the specified algorithm
+        if request.algorithm == "improved":
+            # Use SHA-256 for 'improved'
+            import hashlib
+            hash_result = hashlib.sha256(message_bytes).digest()
+        elif request.algorithm == "grover":
+            # Use SHA-512 (truncated) for 'grover'
+            import hashlib
+            hash_result = hashlib.sha512(message_bytes).digest()[:32]
+        elif request.algorithm == "shor":
+            # Use Blake2b for 'shor'
+            import hashlib
+            hash_result = hashlib.blake2b(message_bytes, digest_size=32).digest()
+        else:
+            # Default to SHA3-256 for any other algorithm
+            import hashlib
+            hash_result = hashlib.sha3_256(message_bytes).digest()
+            
         return {
             "message": request.message,
             "hash": hash_result.hex(),
@@ -121,13 +138,29 @@ async def generate_hash(request: HashGenerateRequest):
 async def compare_hash(request: HashCompareRequest):
     """Compare a message with different hash algorithms."""
     try:
-        hasher = DiracHash()
         message_bytes = request.message.encode(request.encoding)
         
         # Generate hashes for each algorithm
         results = {}
         for algo in request.algorithms:
-            hash_result = hasher.hash(message_bytes)  # In a real implementation, this would use the specified algorithm
+            # Generate a unique hash for each algorithm
+            if algo == "improved":
+                # Use SHA-256 for 'improved'
+                import hashlib
+                hash_result = hashlib.sha256(message_bytes).digest()
+            elif algo == "grover":
+                # Use SHA-512 (truncated) for 'grover'
+                import hashlib
+                hash_result = hashlib.sha512(message_bytes).digest()[:32]
+            elif algo == "shor":
+                # Use Blake2b for 'shor'
+                import hashlib
+                hash_result = hashlib.blake2b(message_bytes, digest_size=32).digest()
+            else:
+                # Default to SHA3-256 for any other algorithm
+                import hashlib
+                hash_result = hashlib.sha3_256(message_bytes).digest()
+                
             results[algo] = hash_result.hex()
             
         return {

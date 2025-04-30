@@ -54,5 +54,6 @@ class HashComparisonRequest(BaseModel):
 
 class HashComparisonResponse(BaseModel):
     """Response model for hash comparison."""
-    message_preview: str = Field(..., description="Preview of the input message")
-    results: Dict[str, Any] = Field(..., description="Hash results for each algorithm") 
+    message: str = Field(..., description="Original input message")
+    results: Dict[str, str] = Field(..., description="Hash results for each algorithm")
+    encoding: str = Field(..., description="Message encoding used") 

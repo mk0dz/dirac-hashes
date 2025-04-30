@@ -81,34 +81,9 @@
                 encoding: 'utf-8'
             };
             
-            // For testing without the API
-            // Simulate API response
-            const mockResponse = {
-                message_preview: messageInput,
-                results: {
-                    improved: {
-                        hash: 'f0d01a340b673ce0dbc7e2fd1c371e4b936fec4c13c6c398c4c54c5858899bf2',
-                        digest_length: 32,
-                        time_ms: 0.97
-                    },
-                    grover: {
-                        hash: '029428a433b872d6442bf3aa12bce5116ff04ee240424cf8924b58a8ac9f0973',
-                        digest_length: 32,
-                        time_ms: 4.76
-                    },
-                    shor: {
-                        hash: 'cef8ee7722eccd39624eafa4a0974f7f840f90de582257521a9ff7672a0d81ee',
-                        digest_length: 32,
-                        time_ms: 0.05
-                    }
-                }
-            };
+            // Use the actual API
+            resultElement.innerHTML = '<div>Loading...</div>';
             
-            // Display the mock response for testing
-            displayResults(mockResponse);
-            
-            // Uncomment this to use the actual API when available
-            /*
             fetch(`${API_URL}/api/hash/compare`, {
                 method: 'POST',
                 headers: {
@@ -124,7 +99,6 @@
                 console.error('Error comparing hashes:', error);
                 resultElement.textContent = 'Error comparing hashes. Please try again.';
             });
-            */
         }
         
         function displayResults(data) {
@@ -132,8 +106,8 @@
             let resultHTML = '<div class="code-block">';
             
             // Display each algorithm's hash result correctly
-            for (const [algorithm, result] of Object.entries(data.results)) {
-                resultHTML += `<strong>${algorithm}:</strong> ${result.hash}<br>`;
+            for (const [algorithm, hashValue] of Object.entries(data.results)) {
+                resultHTML += `<strong>${algorithm}:</strong> ${hashValue}<br>`;
             }
             
             resultHTML += '</div>';

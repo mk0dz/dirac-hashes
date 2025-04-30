@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Global API URL - change this to your deployed API URL
-const API_URL = 'https://dirac-hashes.onrender.com';
+const API_URL = 'http://localhost:8000';
 
 // Page Navigation
 function setupNavigation() {
@@ -369,6 +369,9 @@ function compareHashes() {
         encoding: 'utf-8'
     };
     
+    // Show loading indicator
+    resultElement.innerHTML = '<div>Loading...</div>';
+    
     fetch(`${API_URL}/api/hash/compare`, {
         method: 'POST',
         headers: {
@@ -381,8 +384,9 @@ function compareHashes() {
         let resultHTML = '<div class="code-block">';
         
         // Display each algorithm's hash result correctly
-        for (const [algorithm, result] of Object.entries(data.results)) {
-            resultHTML += `<strong>${algorithm}:</strong> ${result.hash}<br>`;
+        // The API returns hashValue directly as a string, not as an object with a hash property
+        for (const [algorithm, hashValue] of Object.entries(data.results)) {
+            resultHTML += `<strong>${algorithm}:</strong> ${hashValue}<br>`;
         }
         
         resultHTML += '</div>';

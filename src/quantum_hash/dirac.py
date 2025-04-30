@@ -55,17 +55,21 @@ class DiracHash:
         if isinstance(data, str):
             data = data.encode('utf-8')
         
+        # Create algorithm signature by prepending the algorithm name to the data
+        # This ensures each algorithm produces a unique hash even for the same input
+        algorithm_signature = algorithm.lower().encode() + b':' + data
+        
         # Use optimized implementations if available and requested
         if optimized and _HAVE_OPTIMIZED:
             if algorithm.lower() == 'improved_grover' or algorithm.lower() == 'optimized_grover':
-                return optimized_grover_hash(data, digest_size)
+                return optimized_grover_hash(algorithm_signature, digest_size)
             elif algorithm.lower() == 'improved_shor' or algorithm.lower() == 'optimized_shor':
-                return optimized_shor_hash(data, digest_size)
+                return optimized_shor_hash(algorithm_signature, digest_size)
             elif algorithm.lower() == 'improved' or algorithm.lower() == 'optimized':
-                return optimized_hybrid_hash(data, digest_size)
+                return optimized_hybrid_hash(algorithm_signature, digest_size)
         
         # Fall back to non-optimized implementations
-        return quantum_hash(data, algorithm, digest_size)
+        return quantum_hash(algorithm_signature, algorithm, digest_size)
     
     @staticmethod
     def hmac(key: Union[bytes, str], data: Union[bytes, str],

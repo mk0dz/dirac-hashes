@@ -130,6 +130,11 @@ def grover_hash(data: bytes, digest_size: int = 32) -> bytes:
     Returns:
         Hashed output as bytes
     """
+    # Add algorithm-specific identifier by prepending a byte
+    # only if it's not already tagged (to avoid double tagging from improved_grover_hash)
+    if not data.startswith(b'grover:'):
+        data = b'grover:' + data
+        
     # Make algorithm deterministic for cryptographic use
     # Generate a seed based on the data
     if len(data) == 0:
