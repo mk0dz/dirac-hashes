@@ -5,6 +5,9 @@ on:
     tags:
       - 'v*'
 
+permissions:
+  contents: write
+
 jobs:
   update-version:
     runs-on: ubuntu-latest
@@ -44,8 +47,8 @@ jobs:
     
     - name: Commit version changes
       run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
         git add setup.py src/quantum_hash/__init__.py
         git commit -m "Bump version to $VERSION"
         
@@ -53,4 +56,4 @@ jobs:
       uses: ad-m/github-push-action@master
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        branch: ${{ github.ref }} 
+        branch: ${{ github.ref_name }} 
