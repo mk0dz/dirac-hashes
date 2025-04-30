@@ -12,7 +12,7 @@ import numpy as np
 from typing import Dict, List, Tuple, Union, Optional
 
 # Import DiracHash for consistent hashing
-from quantum_hash.dirac import DiracHash
+from ..dirac import DiracHash
 
 
 class DilithiumSignature:

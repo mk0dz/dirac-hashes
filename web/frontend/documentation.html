@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dirac Hashes - Documentation</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>dirac-hashes</h1>
+            <p>post-quantum cryptography</p>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="documentation.html" class="active">Documentation</a></li>
+                <li><a href="hash-test.html">Hash Test</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="documentation">
+        <h2>Dirac Hashes Documentation</h2>
+        
+        <section>
+            <h3>Introduction</h3>
+            <p>Dirac Hashes is a quantum-resistant cryptographic library designed to provide secure hashing and signature algorithms that can withstand attacks from quantum computers.</p>
+        </section>
+
+        <section>
+            <h3>Installation</h3>
+            <pre><code>pip install dirac-hashes</code></pre>
+        </section>
+
+        <section>
+            <h3>Hash Functions</h3>
+            <h4>DiracHash</h4>
+            <p>A quantum-resistant hash function based on quantum mechanical principles.</p>
+            <pre><code>from quantum_hash.dirac import DiracHash
+
+# Create a hash object
+hash_obj = DiracHash()
+
+# Hash a message
+message = b"Hello, quantum world!"
+hash_value = hash_obj.hash(message)
+
+# Verify the hash
+print(f"Hash: {hash_value.hex()}")
+</code></pre>
+        </section>
+
+        <section>
+            <h3>Digital Signatures</h3>
+            <h4>DiracSignature</h4>
+            <p>A quantum-resistant digital signature scheme.</p>
+            <pre><code>from quantum_hash.signatures import DiracSignature
+
+# Generate a key pair
+signature = DiracSignature()
+public_key, private_key = signature.generate_keypair()
+
+# Sign a message
+message = b"Sign this quantum-resistant message"
+signature_value = signature.sign(message, private_key)
+
+# Verify the signature
+is_valid = signature.verify(message, signature_value, public_key)
+print(f"Signature valid: {is_valid}")
+</code></pre>
+        </section>
+
+        <section>
+            <h3>API Reference</h3>
+            <p>For detailed API documentation, please refer to the <a href="https://github.com/mk0dz/dirac-hashes">GitHub repository</a>.</p>
+        </section>
+    </main>
+
+    <footer>
+        <div id="api-status">API: <span class="status">Checking...</span></div>
+        <div id="hash-requests">Hash requests: <span class="count">0</span></div>
+        <div id="uptime">Uptime: <span class="time">0h 0m</span></div>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+</html> 

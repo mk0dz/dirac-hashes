@@ -8,6 +8,14 @@ offering endpoints for hash generation, digital signatures, and key management.
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
+import sys
+import os
+
+# Add the project root to path to make imports work
+current_dir = os.path.dirname(os.path.abspath(__file__))
+web_dir = os.path.dirname(current_dir)
+project_root = os.path.dirname(web_dir)
+sys.path.insert(0, project_root)
 
 # Create the FastAPI application
 app = FastAPI(
@@ -26,7 +34,7 @@ app.add_middleware(
 )
 
 # Import routes
-from api.routes import hash_routes, signature_routes, kem_routes
+from web.api.routes import hash_routes, signature_routes, kem_routes
 
 # Include routers
 app.include_router(hash_routes.router, prefix="/api/hash", tags=["Hash Functions"])

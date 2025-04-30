@@ -12,6 +12,10 @@ import os
 import time
 from typing import Dict, List, Any
 
+# Add project root to Python path
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.insert(0, project_root)
+
 # Import components for testing
 from src.quantum_hash.dirac import DiracHash
 from src.quantum_hash.signatures.lamport import LamportSignature

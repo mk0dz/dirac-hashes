@@ -8,11 +8,12 @@ as a signature scheme.
 import os
 import hashlib
 import hmac
+import secrets
 import numpy as np
 from typing import Dict, Tuple, List, Any
 
 # Import DiracHash for consistent hashing
-from quantum_hash.dirac import DiracHash
+from ..dirac import DiracHash
 
 
 class KyberKEM:

@@ -5,9 +5,15 @@ These tests have no external dependencies and should run reliably in CI environm
 """
 
 import unittest
+import sys
+import os
 
-from quantum_hash.dirac import DiracHash
-from quantum_hash.signatures.dilithium import DilithiumSignature
+# Add project root to Python path
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.insert(0, project_root)
+
+from src.quantum_hash.dirac import DiracHash
+from src.quantum_hash.signatures.dilithium import DilithiumSignature
 
 
 class TestCorePackage(unittest.TestCase):

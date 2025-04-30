@@ -6,22 +6,22 @@ This module provides easy access to all quantum-inspired hash and key functions.
 
 from typing import Tuple, Dict, Union, Optional, List
 
-from quantum_hash.core.grover import grover_hash
-from quantum_hash.core.shor import shor_hash, shor_inspired_key_generation
-from quantum_hash.core.improved_hash import (
+from .core.grover import grover_hash
+from .core.shor import shor_hash, shor_inspired_key_generation
+from .core.improved_hash import (
     improved_grover_hash, improved_shor_hash, improved_hybrid_hash
 )
 # Import SIMD-optimized implementations
 try:
-    from quantum_hash.core.simd_optimized import (
+    from .core.simd_optimized import (
         optimized_grover_hash, optimized_shor_hash, optimized_hybrid_hash
     )
     _HAVE_OPTIMIZED = True
 except ImportError:
     _HAVE_OPTIMIZED = False
 
-from quantum_hash.utils.hash import quantum_hash, quantum_hmac
-from quantum_hash.utils.keys import (generate_quantum_seed, generate_keypair,
+from .utils.hash import quantum_hash, quantum_hmac
+from .utils.keys import (generate_quantum_seed, generate_keypair,
                                 derive_key, format_key, parse_key)
 
 

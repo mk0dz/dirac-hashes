@@ -11,4 +11,4 @@ __email__ = 'example@example.com'
 __license__ = 'MIT'
 
 # Expose key classes and functions at package level
-from quantum_hash.dirac import DiracHash 
+from .dirac import DiracHash 
