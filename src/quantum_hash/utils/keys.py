@@ -10,7 +10,7 @@ import hmac
 from typing import Tuple, Dict, Callable, Any, Optional, Union
 
 # Import the quantum hash functions
-from src.quantum_hash.utils.hash import quantum_hash, _HAVE_OPTIMIZED
+from quantum_hash.utils.hash import quantum_hash, _HAVE_OPTIMIZED
 
 
 def generate_quantum_seed(entropy_bytes: int = 32) -> bytes:

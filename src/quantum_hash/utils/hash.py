@@ -7,15 +7,15 @@ import hmac
 import os
 from typing import Callable, Optional, Union
 
-from src.quantum_hash.core.grover import grover_hash
-from src.quantum_hash.core.shor import shor_hash
-from src.quantum_hash.core.improved_hash import (
+from quantum_hash.core.grover import grover_hash
+from quantum_hash.core.shor import shor_hash
+from quantum_hash.core.improved_hash import (
     improved_grover_hash, improved_shor_hash, improved_hybrid_hash
 )
 
 # Import SIMD-optimized implementations if available
 try:
-    from src.quantum_hash.core.simd_optimized import (
+    from quantum_hash.core.simd_optimized import (
         optimized_grover_hash, optimized_shor_hash, optimized_hybrid_hash
     )
     _HAVE_OPTIMIZED = True

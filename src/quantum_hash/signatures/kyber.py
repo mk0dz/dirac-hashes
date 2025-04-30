@@ -1,17 +1,18 @@
 """
-CRYSTALS-Kyber Key Encapsulation Mechanism Implementation.
+Kyber signature scheme adaptation.
 
-This module implements a simplified version of the CRYSTALS-Kyber scheme,
-which is a lattice-based key encapsulation mechanism (KEM) standardized by NIST
-as a post-quantum alternative to traditional key exchange schemes based on ECC.
+This module adapts the Kyber KEM (Key Encapsulation Mechanism) to be used
+as a signature scheme.
 """
 
 import os
-import secrets
+import hashlib
+import hmac
 import numpy as np
-from typing import Dict, List, Tuple, Union, Optional
+from typing import Dict, Tuple, List, Any
 
-from src.quantum_hash.dirac import DiracHash
+# Import DiracHash for consistent hashing
+from quantum_hash.dirac import DiracHash
 
 
 class KyberKEM:

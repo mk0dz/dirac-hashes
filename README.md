@@ -4,56 +4,149 @@ A next-generation cryptographic hash library built for speed, security, and quan
 
 ## About
 
-Dirac Hashes is a project aimed at developing and testing high-performance cryptographic hash functions that are resistant to quantum computing attacks. This repository contains tools for testing and comparing the performance of Dirac hash algorithms against industry-standard algorithms.
+Dirac Hashes is a project aimed at developing and testing high-performance cryptographic hash functions that are resistant to quantum computing attacks. This repository contains a Python package implementing quantum-resistant hash functions, digital signature schemes, and key encapsulation mechanisms (KEM), plus tools for testing and comparing their performance.
 
 ## Features
 
-- Test and compare multiple hash algorithms:
-  - Dirac-256
-  - Dirac-512
-  - SHA-256
-  - SHA3-256
-  - BLAKE2b
-  - BLAKE3
-- Measure and compare performance metrics
-- Support for various input encodings
-- Save and export hash results
-- Performance history tracking
+- Quantum-resistant hash algorithms:
+  - Improved (default, recommended)
+  - Grover
+  - Shor
+  - Hybrid
+  - Improved Grover
+  - Improved Shor
+- Post-quantum signature schemes:
+  - Dilithium (NIST standard)
+  - SPHINCS+
+  - Lamport
+- Key Encapsulation Mechanisms (KEM):
+  - Kyber (NIST standard)
+- Web-based testing interface with performance visualization
+- Simple Python API for integration into other projects
 
-## Getting Started
+## Installation
 
-To run the hash testing tool locally:
+### Python Package
 
-1. Clone this repository:
-   ```
-   git clone https://github.com/your-username/dirac-hashes.git
-   cd dirac-hashes
-   ```
+Install the package from PyPI:
 
-2. Open `index.html` in your browser or set up a local server:
-   ```
-   # Using Python 3
-   python -m http.server
-   
-   # Using Node.js with live-server
-   npx live-server
-   ```
+```bash
+pip install dirac-hashes
+```
 
-3. Navigate to the Hash Testing Tool from the main page
+Or install from source:
+
+```bash
+git clone https://github.com/your-username/dirac-hashes.git
+cd dirac-hashes
+pip install -e .
+```
+
+### Development Setup
+
+For development, install the dev dependencies:
+
+```bash
+pip install -r requirements-dev.txt
+```
+
+## Quick Start
+
+```python
+from quantum_hash.dirac import DiracHash
+from quantum_hash.signatures.dilithium import DilithiumSignature
+
+# Generate a hash
+message = "Hello, quantum world!"
+hash_value = DiracHash.hash(message)
+print(f"Hash: {hash_value.hex()}")
+
+# Generate a key pair
+dilithium = DilithiumSignature()
+private_key, public_key = dilithium.generate_keypair()
+
+# Sign a message
+signature = dilithium.sign(message.encode(), private_key)
+
+# Verify the signature
+is_valid = dilithium.verify(message.encode(), signature, public_key)
+print(f"Signature valid: {is_valid}")
+```
+
+For more examples, see the [examples directory](examples/).
 
 ## Project Structure
 
 ```
 dirac-hashes/
-├── index.html                # Main entry point
-├── README.md                 # This file
-├── frontend/
-│   ├── html/
-│   │   └── hash-test.html    # Hash testing interface
-│   ├── css/
-│   │   └── hash-test.css     # Styles for hash testing
-│   └── js/
-│       └── hash-test.js      # Hash testing functionality
+├── deployment/              # Docker and deployment files
+├── docs/                    # Documentation files
+├── examples/                # Example scripts
+├── src/                     # Python package source
+│   └── quantum_hash/        # Main package
+│       ├── core/            # Core algorithms
+│       ├── signatures/      # Signature schemes
+│       ├── kem/             # Key encapsulation
+│       └── utils/           # Utility functions
+├── tests/                   # Test suite
+├── tools/                   # Benchmark and demo tools
+├── web/                     # Web interface and API
+├── README.md                # This file
+└── setup.py                 # Package setup
+```
+
+## Web Interface
+
+To run the web interface locally:
+
+1. Install dependencies:
+   ```bash
+   pip install -r requirements-dev.txt
+   ```
+
+2. Run the API server:
+   ```bash
+   python web/run_api.py
+   ```
+
+3. In another terminal, serve the frontend:
+   ```bash
+   python web/serve_frontend.py
+   ```
+
+4. Open `http://localhost:8000` in your browser
+
+## Tools
+
+### Benchmarking
+
+Run performance benchmarks:
+
+```bash
+python tools/benchmark.py
+```
+
+### Demo
+
+Run the interactive demo:
+
+```bash
+python tools/demo.py
+```
+
+## Docker Deployment
+
+Docker files are provided in the `deployment` directory for containerized deployment:
+
+```bash
+docker build -t dirac-hashes -f deployment/Dockerfile .
+docker run -p 8000:8000 -p 8080:8080 dirac-hashes
+```
+
+Or use Docker Compose:
+
+```bash
+docker-compose -f deployment/docker-compose.yml up
 ```
 
 ## Future Development

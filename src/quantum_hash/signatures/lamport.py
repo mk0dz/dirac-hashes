@@ -1,16 +1,18 @@
 """
-Lamport Signature Scheme Implementation.
+Lamport one-time signature scheme.
 
-This module implements the Lamport one-time signature scheme, which is
-considered secure against quantum computer attacks.
+This implements the classical Lamport one-time signature scheme, which is
+quantum-resistant but can only be used to sign a single message with a given key.
 """
 
+import hashlib
 import os
 import secrets
 import numpy as np
 from typing import Dict, List, Tuple, Union
 
-from src.quantum_hash.dirac import DiracHash
+# Import DiracHash for consistent hashing
+from quantum_hash.dirac import DiracHash
 
 
 class LamportSignature:

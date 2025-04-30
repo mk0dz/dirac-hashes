@@ -201,7 +201,7 @@ If you use this library in your research, please cite:
 @software{dirac-hashes,
   author = {Your Name},
   title = {Dirac Hashes: Quantum-Inspired Cryptographic Hash Functions},
-  year = {2023},
+  year = {2025},
   url = {https://github.com/yourusername/dirac-hashes}
 }
 ```

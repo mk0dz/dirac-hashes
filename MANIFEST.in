@@ -1,0 +1,19 @@
+include LICENSE
+include README.md
+include CHANGELOG.md
+include requirements.txt
+
+recursive-include examples *.py
+recursive-include examples *.md
+
+recursive-include src/quantum_hash *.py
+recursive-include src/quantum_hash/tests *.py
+
+prune */__pycache__
+prune */.pytest_cache
+prune .git
+prune .github
+prune .vscode
+prune dist
+prune build
+prune *.egg-info 

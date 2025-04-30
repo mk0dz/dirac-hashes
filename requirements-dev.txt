@@ -1,0 +1,13 @@
+# Development dependencies
+pytest>=6.0.0
+black>=21.5b2
+isort>=5.0.0
+mypy>=0.7
+build>=0.7.0
+twine>=3.4.0
+
+# API dependencies (for web component)
+fastapi>=0.70.0
+uvicorn>=0.15.0
+
+# All main package dependencies are automatically installed with the package itself 

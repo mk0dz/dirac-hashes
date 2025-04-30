@@ -11,7 +11,8 @@ import secrets
 import math
 from typing import Dict, List, Tuple, Union, Optional
 
-from src.quantum_hash.dirac import DiracHash
+# Import DiracHash for consistent hashing
+from quantum_hash.dirac import DiracHash
 
 
 class SPHINCSSignature:
