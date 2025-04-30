@@ -1,54 +1,184 @@
-name: Publish to PyPI
+name: Automated Version Publish
 
 on:
-  release:
-    types: [created]
+  workflow_dispatch:
+    inputs:
+      bump_type:
+        description: 'Type of version bump (major, minor, patch)'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
 
 permissions:
-  contents: read
-  id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
+  contents: write
 
 jobs:
-  deploy:
+  test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11"]
     
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          # Install explicit dependencies first
+          pip install numpy scipy qiskit matplotlib cryptography pydantic python-multipart
+          # Then install the package
+          pip install -e .
+          pip install pytest pytest-cov
+      
+      - name: Run verification script
+        run: |
+          python verify_install.py
+      
+      - name: Format with Black
+        run: |
+          # Format code instead of just checking
+          pip install black isort
+          python -m black .
+          python -m isort .
+
+  version-bump:
+    needs: test
+    runs-on: ubuntu-latest
+    outputs:
+      new_version: ${{ steps.bump_version.outputs.new_version }}
     
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.10'
-        
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        # Install build tools
-        pip install build twine
-        # Install explicit dependencies first
-        pip install numpy scipy qiskit matplotlib cryptography pydantic python-multipart
-        # Then install the package
-        pip install -e .
-        
-    - name: List installed packages
-      run: |
-        pip list
-        
-    - name: Verify package
-      run: |
-        python verify_install.py
-        
-    - name: Build package
-      run: |
-        python -m build
-        
-    - name: Check package
-      run: |
-        twine check dist/*
-        
-    - name: Publish to PyPI
-      uses: pypa/gh-action-pypi-publish@release/v1
-      with:
-        password: ${{ secrets.PYPI_API_TOKEN }}
-        verify_metadata: true
-        verbose: true 
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install setuptools wheel
+      
+      - name: Bump version
+        id: bump_version
+        run: |
+          # Get current version from __init__.py
+          current_version=$(grep -Po "__version__ = '\K[^']*" src/quantum_hash/__init__.py)
+          echo "Current version: $current_version"
+          
+          # Split version into components
+          IFS='.' read -r -a version_parts <<< "$current_version"
+          major="${version_parts[0]}"
+          minor="${version_parts[1]}"
+          patch="${version_parts[2]}"
+          
+          # Calculate new version based on bump type
+          case "${{ github.event.inputs.bump_type }}" in
+            patch)
+              new_patch=$((patch + 1))
+              new_version="$major.$minor.$new_patch"
+              ;;
+            minor)
+              new_minor=$((minor + 1))
+              new_version="$major.$new_minor.0"
+              ;;
+            major)
+              new_major=$((major + 1))
+              new_version="$new_major.0.0"
+              ;;
+          esac
+          
+          echo "New version: $new_version"
+          
+          # Update version in __init__.py
+          sed -i "s/__version__ = '$current_version'/__version__ = '$new_version'/" src/quantum_hash/__init__.py
+          
+          # Update version in pyproject.toml if it exists
+          if [ -f "pyproject.toml" ]; then
+            sed -i "s/version = \"$current_version\"/version = \"$new_version\"/" pyproject.toml
+          fi
+          
+          # Update version in setup.py if it exists
+          if [ -f "setup.py" ]; then
+            sed -i "s/version=\"$current_version\"/version=\"$new_version\"/" setup.py
+          fi
+          
+          # Output new version
+          echo "new_version=$new_version" >> $GITHUB_OUTPUT
+          
+          # Configure git
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          
+          # Commit version changes
+          git commit -am "Bump version to $new_version"
+          
+          # Create and push tag
+          git tag v$new_version
+          git push origin v$new_version
+          git push
+
+  release-build:
+    needs: version-bump
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: v${{ needs.version-bump.outputs.new_version }}
+      
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Build release distributions
+        run: |
+          python -m pip install build
+          python -m build
+
+      - name: Upload distributions
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-dists
+          path: dist/
+      
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ needs.version-bump.outputs.new_version }}
+          name: Release v${{ needs.version-bump.outputs.new_version }}
+          generate_release_notes: true
+          files: |
+            dist/*
+
+  pypi-publish:
+    runs-on: ubuntu-latest
+    needs:
+      - version-bump
+      - release-build
+    permissions:
+      id-token: write  # Required for trusted publishing
+
+    steps:
+      - name: Retrieve release distributions
+        uses: actions/download-artifact@v4
+        with:
+          name: release-dists
+          path: dist/
+
+      - name: Publish release distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist/

@@ -3,6 +3,7 @@
 [![Test](https://github.com/mk0dz/dirac-hashes/actions/workflows/test.yml/badge.svg)](https://github.com/mk0dz/dirac-hashes/actions/workflows/test.yml)
 [![PyPI version](https://badge.fury.io/py/dirac-hashes.svg)](https://badge.fury.io/py/dirac-hashes)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[!Codecov](https://app.codecov.io/gh/mk0dz/dirac-hashes)
 
 A next-generation cryptographic hash library built for speed, security, and quantum resistance.
 
