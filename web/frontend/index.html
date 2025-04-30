@@ -165,7 +165,15 @@ message = b"Your message here"
 digest = DiracHash.hash(message)
 
 # Use a specific algorithm
-digest = DiracHash.hash(message, algorithm="improved_grover")
+digest = DiracHash.hash(message, algorithm="hybrid")
+hash_value = DiracHash.hash(message)
+print(f"Hash: {hash_value.hex()}")
+
+# Compare multiple hash algorithms
+algorithms = ["improved", "grover", "shor"]
+for algo in algorithms:
+    hash_value = DiracHash.hash(message, algorithm=algo)
+    print(f"{algo}: {hash_value.hex()}")
 
 # Get a list of available algorithms
 algorithms = DiracHash.get_supported_algorithms()

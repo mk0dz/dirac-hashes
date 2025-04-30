@@ -380,8 +380,9 @@ function compareHashes() {
     .then(data => {
         let resultHTML = '<div class="code-block">';
         
-        for (const [algorithm, hash] of Object.entries(data.results)) {
-            resultHTML += `<strong>${algorithm}:</strong> ${hash}<br>`;
+        // Display each algorithm's hash result correctly
+        for (const [algorithm, result] of Object.entries(data.results)) {
+            resultHTML += `<strong>${algorithm}:</strong> ${result.hash}<br>`;
         }
         
         resultHTML += '</div>';

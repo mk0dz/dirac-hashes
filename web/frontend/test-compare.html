@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hash Comparison Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .code-block {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .mt-20 {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Compare Hash Algorithms</h1>
+    <p>Test the fixed hash comparison functionality.</p>
+    
+    <div>
+        <label for="compare-input">Message:</label>
+        <textarea id="compare-input" rows="3" placeholder="Enter text to hash with multiple algorithms"></textarea>
+    </div>
+    
+    <button id="compare-button">Compare Algorithms</button>
+    
+    <div id="compare-result" class="mt-20"></div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const compareButton = document.getElementById('compare-button');
+            
+            compareButton.addEventListener('click', function() {
+                compareHashes();
+            });
+        });
+        
+        // API URL - update based on your deployment
+        const API_URL = 'http://localhost:8000';
+        
+        // Compare Hashes
+        function compareHashes() {
+            const messageInput = document.getElementById('compare-input').value;
+            const resultElement = document.getElementById('compare-result');
+            
+            if (!messageInput) {
+                resultElement.textContent = 'Please enter a message to hash';
+                return;
+            }
+            
+            const data = {
+                message: messageInput,
+                algorithms: ['improved', 'grover', 'shor'],
+                encoding: 'utf-8'
+            };
+            
+            // For testing without the API
+            // Simulate API response
+            const mockResponse = {
+                message_preview: messageInput,
+                results: {
+                    improved: {
+                        hash: 'f0d01a340b673ce0dbc7e2fd1c371e4b936fec4c13c6c398c4c54c5858899bf2',
+                        digest_length: 32,
+                        time_ms: 0.97
+                    },
+                    grover: {
+                        hash: '029428a433b872d6442bf3aa12bce5116ff04ee240424cf8924b58a8ac9f0973',
+                        digest_length: 32,
+                        time_ms: 4.76
+                    },
+                    shor: {
+                        hash: 'cef8ee7722eccd39624eafa4a0974f7f840f90de582257521a9ff7672a0d81ee',
+                        digest_length: 32,
+                        time_ms: 0.05
+                    }
+                }
+            };
+            
+            // Display the mock response for testing
+            displayResults(mockResponse);
+            
+            // Uncomment this to use the actual API when available
+            /*
+            fetch(`${API_URL}/api/hash/compare`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                displayResults(data);
+            })
+            .catch(error => {
+                console.error('Error comparing hashes:', error);
+                resultElement.textContent = 'Error comparing hashes. Please try again.';
+            });
+            */
+        }
+        
+        function displayResults(data) {
+            const resultElement = document.getElementById('compare-result');
+            let resultHTML = '<div class="code-block">';
+            
+            // Display each algorithm's hash result correctly
+            for (const [algorithm, result] of Object.entries(data.results)) {
+                resultHTML += `<strong>${algorithm}:</strong> ${result.hash}<br>`;
+            }
+            
+            resultHTML += '</div>';
+            resultElement.innerHTML = resultHTML;
+        }
+    </script>
+</body>
+</html> 
