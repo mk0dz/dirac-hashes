@@ -137,9 +137,32 @@ function updateApiStatusDisplay(isOnline = false, responseTime = null) {
 // Check individual endpoint statuses
 function checkEndpointStatuses() {
     const endpoints = [
-        { name: 'hash', path: '/api/hash/info' },
-        { name: 'signatures', path: '/api/signatures/keypair' },
-        { name: 'kem', path: '/api/kem/keypair' }
+        { 
+            name: 'hash', 
+            path: '/api/hash/info',
+            method: 'GET',
+            body: null
+        },
+        { 
+            name: 'signatures', 
+            path: '/api/signatures/keypair',
+            method: 'POST',
+            body: {
+                scheme: 'dilithium',
+                hash_algorithm: 'improved',
+                security_level: 1
+            }
+        },
+        { 
+            name: 'kem', 
+            path: '/api/kem/keypair',
+            method: 'POST',
+            body: {
+                scheme: 'kyber',
+                hash_algorithm: 'improved',
+                security_level: 1
+            }
+        }
     ];
     
     endpoints.forEach(endpoint => {
@@ -149,15 +172,23 @@ function checkEndpointStatuses() {
         if (statusElement && responseTimeElement) {
             const startTime = Date.now();
             
-            fetch(`${API_URL}${endpoint.path}`, {
-                method: 'GET',
+            const fetchOptions = {
+                method: endpoint.method,
                 headers: {
                     'Accept': 'application/json',
+                    'Content-Type': 'application/json'
                 },
                 mode: 'cors',
                 cache: 'no-cache',
                 timeout: 5000
-            })
+            };
+            
+            // Add body for POST requests
+            if (endpoint.method === 'POST' && endpoint.body) {
+                fetchOptions.body = JSON.stringify(endpoint.body);
+            }
+            
+            fetch(`${API_URL}${endpoint.path}`, fetchOptions)
             .then(response => {
                 const endTime = Date.now();
                 const responseTime = endTime - startTime;
