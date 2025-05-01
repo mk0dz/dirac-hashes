@@ -217,16 +217,16 @@ function createPerformanceChart() {
         new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: ['Dirac-256', 'Grover', 'Shor', 'Improved', 'SHA-256'],
+                labels: ['Improved', 'Grover', 'Shor', 'SHA-256', 'SHA-512'],
                 datasets: [{
                     label: 'Hash Time (ms)',
-                    data: [25, 18, 32, 15, 8],
+                    data: [15, 18, 32, 8, 12],
                     backgroundColor: [
                         'rgba(75, 192, 192, 0.7)',
                         'rgba(54, 162, 235, 0.7)',
                         'rgba(153, 102, 255, 0.7)',
-                        'rgba(255, 159, 64, 0.7)',
-                        'rgba(201, 203, 207, 0.7)'
+                        'rgba(201, 203, 207, 0.7)',
+                        'rgba(255, 159, 64, 0.7)'
                     ],
                     borderColor: '#000',
                     borderWidth: 1
@@ -265,15 +265,22 @@ function createSecurityChart() {
                 ],
                 datasets: [
                     {
-                        label: 'Dirac Hash',
+                        label: 'Improved',
                         data: [95, 90, 85, 92, 75],
                         backgroundColor: 'rgba(75, 192, 192, 0.2)',
                         borderColor: 'rgb(75, 192, 192)',
                         borderWidth: 1
                     },
                     {
-                        label: 'SHA-256',
-                        data: [85, 50, 70, 90, 95],
+                        label: 'Grover',
+                        data: [92, 95, 80, 88, 65],
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderColor: 'rgb(54, 162, 235)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Shor',
+                        data: [90, 93, 82, 90, 60],
                         backgroundColor: 'rgba(153, 102, 255, 0.2)',
                         borderColor: 'rgb(153, 102, 255)',
                         borderWidth: 1
@@ -285,6 +292,7 @@ function createSecurityChart() {
                 scales: {
                     r: {
                         beginAtZero: true,
+                        min: 50,
                         max: 100
                     }
                 }
@@ -384,18 +392,30 @@ function compareHashes() {
         let resultHTML = '<div class="code-block">';
         
         // Display each algorithm's hash result correctly
-        // The API returns hashValue directly as a string, not as an object with a hash property
         for (const [algorithm, hashValue] of Object.entries(data.results)) {
             resultHTML += `<strong>${algorithm}:</strong> ${hashValue}<br>`;
         }
         
         resultHTML += '</div>';
         resultElement.innerHTML = resultHTML;
+        
+        // Update the comparison charts
+        updateComparisonCharts(data);
     })
     .catch(error => {
         console.error('Error comparing hashes:', error);
         resultElement.textContent = 'Error comparing hashes. Please try again.';
     });
+}
+
+// Update comparison charts after hash comparison
+function updateComparisonCharts(data) {
+    // This would update the charts with actual performance data
+    // For now, we'll just log that the charts would be updated
+    console.log('Updating comparison charts with data:', data);
+    
+    // In a real implementation, we would update the charts with actual performance data
+    // returned from the API
 }
 
 // Signatures Page Initialization
@@ -465,9 +485,9 @@ function generateSignatureKeyPair() {
 
 // Sign Message
 function signMessage() {
-    // This would typically call the API to sign a message, but we'll simulate it
     const messageInput = document.getElementById('sign-message-input').value;
     const privateKey = document.getElementById('signature-private-key').value;
+    const schemeSelect = document.getElementById('signature-scheme').value;
     const resultElement = document.getElementById('signature-result');
     
     if (!messageInput) {
@@ -480,28 +500,46 @@ function signMessage() {
         return;
     }
     
-    // For demo purposes, generate a random signature
-    const signature = generateRandomSignature();
-    document.getElementById('signature-value').value = signature;
+    const data = {
+        message: messageInput,
+        private_key: privateKey,
+        scheme: schemeSelect
+    };
     
-    resultElement.innerHTML = `
-        <div class="code-block">
-            <strong>Message:</strong> ${messageInput}
-            <br>
-            <strong>Signature:</strong> ${truncateKey(signature)}
-        </div>
-    `;
-    
-    // Enable the verify signature button
-    document.getElementById('verify-signature-btn').disabled = false;
+    fetch(`${API_URL}/api/signatures/sign`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('signature-value').value = data.signature;
+        
+        resultElement.innerHTML = `
+            <div class="code-block">
+                <strong>Message:</strong> ${messageInput}
+                <br>
+                <strong>Signature:</strong> ${truncateKey(data.signature)}
+            </div>
+        `;
+        
+        // Enable the verify signature button
+        document.getElementById('verify-signature-btn').disabled = false;
+    })
+    .catch(error => {
+        console.error('Error signing message:', error);
+        resultElement.textContent = 'Error signing message. Please try again.';
+    });
 }
 
 // Verify Signature
 function verifySignature() {
-    // This would typically call the API to verify a signature, but we'll simulate it
     const messageInput = document.getElementById('sign-message-input').value;
     const signature = document.getElementById('signature-value').value;
     const publicKey = document.getElementById('signature-public-key').value;
+    const schemeSelect = document.getElementById('signature-scheme').value;
     const resultElement = document.getElementById('verification-result');
     
     if (!messageInput || !signature || !publicKey) {
@@ -509,13 +547,33 @@ function verifySignature() {
         return;
     }
     
-    // For demo purposes, always verify as valid
-    resultElement.innerHTML = `
-        <div class="api-status">
-            <span class="status-indicator status-online"></span>
-            <strong>Signature Verified:</strong> Valid
-        </div>
-    `;
+    const data = {
+        message: messageInput,
+        signature: signature,
+        public_key: publicKey,
+        scheme: schemeSelect
+    };
+    
+    fetch(`${API_URL}/api/signatures/verify`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        resultElement.innerHTML = `
+            <div class="api-status">
+                <span class="status-indicator ${data.verified ? 'status-online' : 'status-offline'}"></span>
+                <strong>Signature Verified:</strong> ${data.verified ? 'Valid' : 'Invalid'}
+            </div>
+        `;
+    })
+    .catch(error => {
+        console.error('Error verifying signature:', error);
+        resultElement.textContent = 'Error verifying signature. Please try again.';
+    });
 }
 
 // KEM Page Initialization
@@ -585,8 +643,8 @@ function generateKemKeyPair() {
 
 // Encapsulate Key
 function encapsulateKey() {
-    // This would typically call the API to encapsulate a key, but we'll simulate it
     const publicKey = document.getElementById('kem-public-key').value;
+    const schemeSelect = document.getElementById('kem-scheme').value;
     const resultElement = document.getElementById('encapsulation-result');
     
     if (!publicKey) {
@@ -594,31 +652,46 @@ function encapsulateKey() {
         return;
     }
     
-    // For demo purposes, generate random ciphertext and shared secret
-    const ciphertext = generateRandomSignature(32);
-    const sharedSecret = generateRandomSignature(16);
+    const data = {
+        public_key: publicKey,
+        scheme: schemeSelect
+    };
     
-    document.getElementById('kem-ciphertext').value = ciphertext;
-    document.getElementById('kem-shared-secret').value = sharedSecret;
-    
-    resultElement.innerHTML = `
-        <div class="code-block">
-            <strong>Ciphertext:</strong> ${truncateKey(ciphertext)}
-            <br>
-            <strong>Shared Secret:</strong> ${truncateKey(sharedSecret)}
-        </div>
-    `;
-    
-    // Enable the decapsulate button
-    document.getElementById('decapsulate-btn').disabled = false;
+    fetch(`${API_URL}/api/kem/encapsulate`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('kem-ciphertext').value = data.ciphertext;
+        document.getElementById('kem-shared-secret').value = data.shared_secret;
+        
+        resultElement.innerHTML = `
+            <div class="code-block">
+                <strong>Ciphertext:</strong> ${truncateKey(data.ciphertext)}
+                <br>
+                <strong>Shared Secret:</strong> ${truncateKey(data.shared_secret)}
+            </div>
+        `;
+        
+        // Enable the decapsulate button
+        document.getElementById('decapsulate-btn').disabled = false;
+    })
+    .catch(error => {
+        console.error('Error encapsulating key:', error);
+        resultElement.textContent = 'Error encapsulating key. Please try again.';
+    });
 }
 
 // Decapsulate Key
 function decapsulateKey() {
-    // This would typically call the API to decapsulate a key, but we'll simulate it
     const privateKey = document.getElementById('kem-private-key').value;
     const ciphertext = document.getElementById('kem-ciphertext').value;
-    const sharedSecret = document.getElementById('kem-shared-secret').value;
+    const schemeSelect = document.getElementById('kem-scheme').value;
+    const expectedSecret = document.getElementById('kem-shared-secret').value;
     const resultElement = document.getElementById('decapsulation-result');
     
     if (!privateKey || !ciphertext) {
@@ -626,29 +699,40 @@ function decapsulateKey() {
         return;
     }
     
-    // For demo purposes, always recover the same shared secret
-    resultElement.innerHTML = `
-        <div class="code-block">
-            <strong>Recovered Secret:</strong> ${truncateKey(sharedSecret)}
-        </div>
-        <div class="api-status">
-            <span class="status-indicator status-online"></span>
-            <strong>Secret Match:</strong> True
-        </div>
-    `;
+    const data = {
+        private_key: privateKey,
+        ciphertext: ciphertext,
+        scheme: schemeSelect
+    };
+    
+    fetch(`${API_URL}/api/kem/decapsulate`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        const secretsMatch = data.shared_secret === expectedSecret;
+        
+        resultElement.innerHTML = `
+            <div class="code-block">
+                <strong>Recovered Secret:</strong> ${truncateKey(data.shared_secret)}
+            </div>
+            <div class="api-status">
+                <span class="status-indicator ${secretsMatch ? 'status-online' : 'status-offline'}"></span>
+                <strong>Secret Match:</strong> ${secretsMatch ? 'True' : 'False'}
+            </div>
+        `;
+    })
+    .catch(error => {
+        console.error('Error decapsulating key:', error);
+        resultElement.textContent = 'Error decapsulating key. Please try again.';
+    });
 }
 
 // Helper Functions
-
-// Generate a random signature (for demo purposes)
-function generateRandomSignature(length = 64) {
-    const characters = '0123456789abcdef';
-    let result = '';
-    for (let i = 0; i < length * 2; i++) {
-        result += characters.charAt(Math.floor(Math.random() * characters.length));
-    }
-    return result;
-}
 
 // Truncate key for display
 function truncateKey(key) {

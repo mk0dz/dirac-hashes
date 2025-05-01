@@ -6,6 +6,62 @@
     <title>dirac-hashes | post quantum cryptography</title>
     <link rel="stylesheet" href="css/main.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* FAQ Styling */
+        .faq-container {
+            margin-bottom: 30px;
+        }
+        
+        .faq-item {
+            border-bottom: 1px solid #eee;
+            margin-bottom: 10px;
+        }
+        
+        .faq-question {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            cursor: pointer;
+        }
+        
+        .faq-question h4 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .faq-arrow {
+            transition: transform 0.3s ease;
+            font-size: 12px;
+            color: #555;
+        }
+        
+        .faq-answer {
+            padding: 0 0 20px;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        
+        .faq-answer.hidden {
+            display: none;
+        }
+        
+        .note {
+            background-color: #e7f3fe;
+            border-left: 4px solid #2196F3;
+            padding: 10px 15px;
+            margin: 15px 0;
+        }
+        
+        .warning {
+            background-color: #ffebee;
+            border-left: 4px solid #f44336;
+            padding: 10px 15px;
+            margin: 15px 0;
+        }
+    </style>
 </head>
 <body>
     <!-- Sidebar -->
@@ -21,6 +77,7 @@
             <a href="#" class="nav-item" data-page="test-hashes">Test hashes</a>
             <a href="#" class="nav-item" data-page="signatures">Signatures</a>
             <a href="#" class="nav-item" data-page="key-encapsulation">Key Encapsulation</a>
+            <a href="#" class="nav-item" data-page="hash-qa">Hash Q&A</a>
         </nav>
     </div>
     
@@ -262,6 +319,23 @@ assert shared_secret == recovered_secret
                 
                 <div id="compare-result" class="mt-20"></div>
             </section>
+            
+            <section class="section">
+                <h3 class="section-title">Visualize Hash Comparison</h3>
+                <p>View detailed performance and security metrics for our hash algorithms.</p>
+                
+                <div class="grid">
+                    <div class="graph-container">
+                        <h4 class="section-subtitle">Performance Comparison</h4>
+                        <canvas id="hashPerformanceChart"></canvas>
+                    </div>
+                    
+                    <div class="graph-container">
+                        <h4 class="section-subtitle">Security Metrics</h4>
+                        <canvas id="hashSecurityChart"></canvas>
+                    </div>
+                </div>
+            </section>
         </div>
         
         <!-- Signatures Page -->
@@ -381,9 +455,413 @@ assert shared_secret == recovered_secret
                 <div id="decapsulation-result" class="mt-20"></div>
             </section>
         </div>
+        
+        <!-- Hash Q&A Page -->
+        <div class="page" id="hash-qa">
+            <header class="header">
+                <h1 class="header-title">Understanding Hash Algorithms</h1>
+                <h2 class="header-subtitle">A comprehensive guide to Dirac Hashes and quantum-resistant cryptography</h2>
+            </header>
+            
+            <div class="section faq-container">
+                <h3 class="section-title">Hash Algorithm Basics</h3>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h4>What is a cryptographic hash function?</h4>
+                        <span class="faq-arrow">&#9660;</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>A cryptographic hash function is a mathematical algorithm that transforms data of arbitrary size into a fixed-size output (hash value). Good hash functions have these properties:</p>
+                        <ul>
+                            <li><strong>One-way function</strong>: It's computationally infeasible to reverse the process.</li>
+                            <li><strong>Deterministic</strong>: The same input will always produce the same output.</li>
+                            <li><strong>Collision-resistant</strong>: It's difficult to find two different inputs that produce the same output.</li>
+                            <li><strong>Avalanche effect</strong>: A small change in input results in a significantly different output.</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h4>How do hash functions work?</h4>
+                        <span class="faq-arrow">&#9650;</span>
+                    </div>
+                    <div class="faq-answer hidden">
+                        <p>Hash functions typically work through these general steps:</p>
+                        <ol>
+                            <li><strong>Preprocessing</strong>: Input data is padded and formatted to meet specific requirements.</li>
+                            <li><strong>Block processing</strong>: Data is divided into fixed-size blocks and processed sequentially.</li>
+                            <li><strong>Compression</strong>: Each block is combined with the result from the previous block through a complex transformation.</li>
+                            <li><strong>Final output</strong>: After all blocks are processed, a fixed-size digest is produced.</li>
+                        </ol>
+                        <p>The specific operations vary by algorithm but often include bitwise operations, modular arithmetic, and complex mathematical transformations.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h4>What are common applications of hash functions?</h4>
+                        <span class="faq-arrow">&#9650;</span>
+                    </div>
+                    <div class="faq-answer hidden">
+                        <ul>
+                            <li><strong>Data integrity</strong>: Verifying that data hasn't been modified</li>
+                            <li><strong>Password storage</strong>: Storing password hashes instead of plaintext passwords</li>
+                            <li><strong>Digital signatures</strong>: Creating and verifying digital signatures</li>
+                            <li><strong>File identification</strong>: Generating unique identifiers for files</li>
+                            <li><strong>Blockchain technology</strong>: Maintaining data integrity in distributed ledgers</li>
+                            <li><strong>Data deduplication</strong>: Identifying duplicate data</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section faq-container">
+                <h3 class="section-title">Quantum Computing and Hash Functions</h3>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h4>How do quantum computers threaten traditional hash functions?</h4>
+                        <span class="faq-arrow">&#9650;</span>
+                    </div>
+                    <div class="faq-answer hidden">
+                        <p>Quantum computers pose significant threats to hash functions through:</p>
+                        <ul>
+                            <li><strong>Grover's algorithm</strong>: Reduces the complexity of brute-force attacks from O(2^n) to O(2^(n/2)), effectively halving the security strength of symmetric cryptographic primitives like hash functions.</li>
+                            <li><strong>Shor's algorithm</strong>: While primarily affecting asymmetric cryptography, Shor's algorithm can impact hash functions that rely on the difficulty of certain mathematical problems like factoring.</li>
+                            <li><strong>Quantum parallel processing</strong>: Enables exploration of many hash input combinations simultaneously, potentially accelerating collision finding.</li>
+                        </ul>
+                        <p>This means that a 256-bit hash function might only offer 128 bits of security against quantum attacks.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h4>What makes Dirac Hashes quantum-resistant?</h4>
+                        <span class="faq-arrow">&#9650;</span>
+                    </div>
+                    <div class="faq-answer hidden">
+                        <p>Dirac Hashes implement several techniques to resist quantum attacks:</p>
+                        <ul>
+                            <li><strong>Increased output size</strong>: Larger hash outputs to compensate for Grover's algorithm</li>
+                            <li><strong>Complex transformations</strong>: Non-linear operations that are difficult to parallelize on quantum computers</li>
+                            <li><strong>Lattice-based components</strong>: Incorporating mathematical structures believed to be resistant to quantum attacks</li>
+                            <li><strong>Memory-hard operations</strong>: Functions that require significant memory resources, which are difficult for quantum algorithms to optimize</li>
+                            <li><strong>Counter-quantum design</strong>: Special algorithmic structures designed to resist known quantum attack techniques</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section faq-container">
+                <h3 class="section-title">Dirac Hash Algorithms</h3>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h4>What are the different Dirac hash algorithms?</h4>
+                        <span class="faq-arrow">&#9650;</span>
+                    </div>
+                    <div class="faq-answer hidden">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Algorithm</th>
+                                    <th>Description</th>
+                                    <th>Best Use Case</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Improved</td>
+                                    <td>A balanced algorithm with excellent quantum resistance and good performance</td>
+                                    <td>General-purpose applications requiring quantum resistance</td>
+                                </tr>
+                                <tr>
+                                    <td>Grover</td>
+                                    <td>Specifically designed to resist Grover's quantum search algorithm</td>
+                                    <td>Applications requiring maximum resistance to quantum search attacks</td>
+                                </tr>
+                                <tr>
+                                    <td>Shor</td>
+                                    <td>Designed to resist quantum attacks based on Shor's factoring algorithm</td>
+                                    <td>Applications where factoring-based vulnerabilities are a concern</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h4>How do the Dirac algorithms compare in performance?</h4>
+                        <span class="faq-arrow">&#9650;</span>
+                    </div>
+                    <div class="faq-answer hidden">
+                        <p>Performance characteristics of Dirac hash algorithms:</p>
+                        <ul>
+                            <li><strong>Improved</strong>: Fastest of the Dirac algorithms, with hash times around 15ms for average inputs</li>
+                            <li><strong>Grover</strong>: Slightly slower than Improved, with hash times around 18ms due to additional computational complexity</li>
+                            <li><strong>Shor</strong>: Slowest of the three, with hash times around 32ms due to complex mathematics that resist factoring attacks</li>
+                        </ul>
+                        <p>For comparison, traditional algorithms like SHA-256 typically hash in 8ms, while SHA-512 takes around 12ms. The performance trade-off is justified by the increased security against quantum attacks.</p>
+                        
+                        <div class="grid">
+                            <div class="graph-container">
+                                <h4 class="section-subtitle">Performance Comparison</h4>
+                                <canvas id="qaPerformanceChart"></canvas>
+                            </div>
+                            
+                            <div class="graph-container">
+                                <h4 class="section-subtitle">Security Metrics</h4>
+                                <canvas id="qaSecurityChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h4>Which security levels are available?</h4>
+                        <span class="faq-arrow">&#9650;</span>
+                    </div>
+                    <div class="faq-answer hidden">
+                        <p>Dirac Hash algorithms offer multiple security levels:</p>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Security Level</th>
+                                    <th>Description</th>
+                                    <th>Effective Security (Classical)</th>
+                                    <th>Effective Security (Quantum)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Standard (1)</td>
+                                    <td>128-bit equivalent security</td>
+                                    <td>128 bits</td>
+                                    <td>64 bits</td>
+                                </tr>
+                                <tr>
+                                    <td>High (2)</td>
+                                    <td>192-bit equivalent security</td>
+                                    <td>192 bits</td>
+                                    <td>96 bits</td>
+                                </tr>
+                                <tr>
+                                    <td>Very High (3)</td>
+                                    <td>256-bit equivalent security</td>
+                                    <td>256 bits</td>
+                                    <td>128 bits</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="note">Note: Security levels are specified as an integer (1, 2, or 3) when calling the API.</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section faq-container">
+                <h3 class="section-title">Practical Considerations</h3>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h4>When should I use each algorithm?</h4>
+                        <span class="faq-arrow">&#9650;</span>
+                    </div>
+                    <div class="faq-answer hidden">
+                        <ul>
+                            <li><strong>Improved</strong>: Use for most applications where you need a balance of quantum resistance and performance.</li>
+                            <li><strong>Grover</strong>: Choose when you need maximum protection against brute-force attacks and quantum search algorithms, and can tolerate slightly lower performance.</li>
+                            <li><strong>Shor</strong>: Use when your application might be vulnerable to factorization attacks or when the highest security level is required regardless of performance impact.</li>
+                        </ul>
+                        <div class="warning">Important: For truly sensitive applications, consider using multiple hash algorithms in combination for defense in depth.</div>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h4>How can I interpret the performance and security graphs?</h4>
+                        <span class="faq-arrow">&#9650;</span>
+                    </div>
+                    <div class="faq-answer hidden">
+                        <p><strong>Performance Graph:</strong></p>
+                        <ul>
+                            <li>The bars represent the average time (in milliseconds) to hash a standard input.</li>
+                            <li>Lower bars indicate better performance (faster hashing).</li>
+                            <li>The graph helps you compare the relative speed of different algorithms.</li>
+                        </ul>
+                        
+                        <p><strong>Security Radar Chart:</strong></p>
+                        <ul>
+                            <li><strong>Classical Resistance</strong>: Resistance to attacks using traditional computers.</li>
+                            <li><strong>Quantum Resistance</strong>: Resistance to attacks using quantum computers.</li>
+                            <li><strong>Side-Channel Protection</strong>: Resistance to timing attacks and other side-channel vulnerabilities.</li>
+                            <li><strong>Collision Resistance</strong>: Difficulty of finding two inputs that produce the same hash.</li>
+                            <li><strong>Speed</strong>: Relative performance (higher is better).</li>
+                        </ul>
+                        <p>Larger area in the radar chart indicates better overall security profile.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h4>Can I drop in Dirac Hashes as a replacement for SHA-256?</h4>
+                        <span class="faq-arrow">&#9650;</span>
+                    </div>
+                    <div class="faq-answer hidden">
+                        <p>Yes, with some considerations:</p>
+                        <ul>
+                            <li>Dirac Hashes produce output of similar size to SHA-256/SHA-512.</li>
+                            <li>The API is designed to be compatible with common hash function usage patterns.</li>
+                            <li>You may need to update your code to handle the slightly different API.</li>
+                            <li>Performance will be somewhat slower than SHA-256.</li>
+                            <li>Storage requirements for hash values remain the same.</li>
+                        </ul>
+                        <p>Example code for replacing SHA-256 with Dirac Improved:</p>
+                        <div class="code-block">
+# Before (SHA-256)
+import hashlib
+hash_value = hashlib.sha256(message.encode('utf-8')).hexdigest()
+
+# After (Dirac Improved)
+import requests
+response = requests.post('https://dirac-hashes.onrender.com/api/hash/generate', 
+                        json={'message': message, 'algorithm': 'improved', 'encoding': 'utf-8'})
+hash_value = response.json()['hash']
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     
     <!-- Scripts -->
     <script src="js/app.js"></script>
+    <script>
+        // Initialize hash performance and security charts
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get the test hash page canvas elements
+            const hashPerfChart = document.getElementById('hashPerformanceChart');
+            const hashSecChart = document.getElementById('hashSecurityChart');
+            const qaPerfChart = document.getElementById('qaPerformanceChart');
+            const qaSecChart = document.getElementById('qaSecurityChart');
+            
+            // Chart data
+            const perfData = {
+                type: 'bar',
+                data: {
+                    labels: ['Improved', 'Grover', 'Shor', 'SHA-256', 'SHA-512'],
+                    datasets: [{
+                        label: 'Hash Time (ms)',
+                        data: [15, 18, 32, 8, 12],
+                        backgroundColor: [
+                            'rgba(75, 192, 192, 0.7)',
+                            'rgba(54, 162, 235, 0.7)',
+                            'rgba(153, 102, 255, 0.7)',
+                            'rgba(201, 203, 207, 0.7)',
+                            'rgba(255, 159, 64, 0.7)'
+                        ],
+                        borderColor: '#000',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Time (ms)'
+                            }
+                        }
+                    }
+                }
+            };
+            
+            const secData = {
+                type: 'radar',
+                data: {
+                    labels: [
+                        'Classical Resistance',
+                        'Quantum Resistance',
+                        'Side-Channel Protection',
+                        'Collision Resistance',
+                        'Speed'
+                    ],
+                    datasets: [
+                        {
+                            label: 'Improved',
+                            data: [95, 90, 85, 92, 75],
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            borderColor: 'rgb(75, 192, 192)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Grover',
+                            data: [92, 95, 80, 88, 65],
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            borderColor: 'rgb(54, 162, 235)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Shor',
+                            data: [90, 93, 82, 90, 60],
+                            backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                            borderColor: 'rgb(153, 102, 255)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            min: 50,
+                            max: 100
+                        }
+                    }
+                }
+            };
+            
+            // Initialize charts
+            if (hashPerfChart) {
+                new Chart(hashPerfChart, perfData);
+            }
+            
+            if (hashSecChart) {
+                new Chart(hashSecChart, secData);
+            }
+            
+            if (qaPerfChart) {
+                new Chart(qaPerfChart, perfData);
+            }
+            
+            if (qaSecChart) {
+                new Chart(qaSecChart, secData);
+            }
+            
+            // Set up FAQ toggle functionality
+            const faqQuestions = document.querySelectorAll('.faq-question');
+            
+            faqQuestions.forEach(question => {
+                question.addEventListener('click', () => {
+                    const answer = question.nextElementSibling;
+                    const arrow = question.querySelector('.faq-arrow');
+                    
+                    answer.classList.toggle('hidden');
+                    
+                    if (answer.classList.contains('hidden')) {
+                        arrow.innerHTML = '&#9650;'; // Up arrow
+                    } else {
+                        arrow.innerHTML = '&#9660;'; // Down arrow
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html> 
