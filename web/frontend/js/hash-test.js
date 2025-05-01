@@ -14,16 +14,18 @@ let selectedAlgorithm = null;
 let lastGeneratedHash = null;
 const performanceData = {};
 
+// API URL
+const API_URL = 'https://dirac-hashes.onrender.com';
+
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
     // Available hash algorithms
     const algorithms = [
-        { id: 'dirac-256', name: 'Dirac-256', description: 'Default quantum-resistant hash (256-bit)' },
-        { id: 'dirac-512', name: 'Dirac-512', description: 'Enhanced security variant (512-bit)' },
-        { id: 'sha256', name: 'SHA-256', description: 'Standard SHA-256 for comparison' },
-        { id: 'sha3-256', name: 'SHA3-256', description: 'SHA-3 Keccak (256-bit)' },
-        { id: 'blake2b', name: 'BLAKE2b', description: 'High-performance BLAKE2b' },
-        { id: 'blake3', name: 'BLAKE3', description: 'Latest BLAKE variant' }
+        { id: 'improved', name: 'Dirac-Improved', description: 'Default quantum-resistant hash (256-bit)' },
+        { id: 'grover', name: 'Dirac-Grover', description: 'Grover-inspired quantum-resistant hash' },
+        { id: 'shor', name: 'Dirac-Shor', description: 'Shor-inspired quantum-resistant hash' },
+        { id: 'dirac-256', name: 'Dirac-256', description: 'Original Dirac hash (256-bit)' },
+        { id: 'sha256', name: 'SHA-256', description: 'Standard SHA-256 for comparison' }
     ];
 
     // DOM elements
@@ -101,32 +103,30 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     async function generateHash() {
-        // In a real application, this would call the backend API
-        // For now, we'll simulate the hash generation
-        
         const startTime = performance.now();
-        
-        // Simulate network delay
-        await new Promise(resolve => setTimeout(resolve, 500 + Math.random() * 800));
         
         const inputData = inputText.value;
         const encoding = encodingSelect.value;
         const algorithm = selectedAlgorithm.id;
         
-        // Simulate hash generation
-        let hashValue;
-        let hashSize;
+        // Call the actual API
+        const response = await fetch(`${API_URL}/api/hash/generate`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                message: inputData,
+                algorithm: algorithm,
+                encoding: encoding
+            })
+        });
         
-        if (algorithm.startsWith('dirac')) {
-            // Simulated Dirac hash output (in production this would come from backend)
-            hashValue = simulateHash(inputData, algorithm);
-            hashSize = algorithm.includes('512') ? 512 : 256;
-        } else {
-            // Simulate other hash algorithms
-            hashValue = simulateHash(inputData, algorithm);
-            hashSize = algorithm.includes('512') ? 512 : 256;
+        if (!response.ok) {
+            throw new Error(`API error: ${response.status} ${response.statusText}`);
         }
         
+        const data = await response.json();
         const endTime = performance.now();
         const duration = endTime - startTime;
         
@@ -135,29 +135,11 @@ document.addEventListener('DOMContentLoaded', () => {
             algorithmId: selectedAlgorithm.id,
             inputLength: new TextEncoder().encode(inputData).length,
             encoding,
-            hashValue,
-            hashSize,
+            hashValue: data.hash,
+            hashSize: data.hash.length * 4, // Approximate bit size from hex chars
             duration,
             date: new Date().toISOString()
         };
-    }
-    
-    function simulateHash(data, algorithm) {
-        // This is just for demonstration - in production, real hash algorithms would be used
-        let hash = '';
-        const hashLength = algorithm.includes('512') ? 128 : 64; // Hex characters (512/256 bits)
-        const chars = '0123456789abcdef';
-        
-        // Deterministic simulation based on input and algorithm
-        const seed = data.length + algorithm.charCodeAt(0) + algorithm.charCodeAt(algorithm.length - 1);
-        
-        for (let i = 0; i < hashLength; i++) {
-            // Simple deterministic pattern based on input data, position, and algorithm
-            const charIndex = (data.charCodeAt(i % data.length) + i + seed) % 16;
-            hash += chars[charIndex];
-        }
-        
-        return hash;
     }
     
     function displayResult(result) {

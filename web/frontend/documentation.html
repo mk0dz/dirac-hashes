@@ -38,43 +38,149 @@
             <h3>Hash Functions</h3>
             <h4>DiracHash</h4>
             <p>A quantum-resistant hash function based on quantum mechanical principles.</p>
-            <pre><code>from quantum_hash.dirac import DiracHash
+            <pre><code>from src.quantum_hash.dirac import DiracHash
 
-# Create a hash object
-hash_obj = DiracHash()
+# Generate a hash using the default (improved) algorithm
+data = b"Hello, quantum world!"
+digest = DiracHash.hash(data)
+print(f"Hash: {DiracHash.format_key(digest)}")
 
-# Hash a message
-message = b"Hello, quantum world!"
-hash_value = hash_obj.hash(message)
-
-# Verify the hash
-print(f"Hash: {hash_value.hex()}")
+# Generate a hash using a specific algorithm
+digest = DiracHash.hash(data, algorithm='improved_grover')
+print(f"Grover-inspired hash: {DiracHash.format_key(digest)}")
 </code></pre>
         </section>
 
         <section>
             <h3>Digital Signatures</h3>
-            <h4>DiracSignature</h4>
-            <p>A quantum-resistant digital signature scheme.</p>
-            <pre><code>from quantum_hash.signatures import DiracSignature
+            <h4>Lamport Signatures</h4>
+            <p>A quantum-resistant one-time signature scheme.</p>
+            <pre><code>from src.quantum_hash.signatures.lamport import LamportSignature
 
-# Generate a key pair
-signature = DiracSignature()
-public_key, private_key = signature.generate_keypair()
+# Create a Lamport signature instance with your preferred hash algorithm
+lamport = LamportSignature(hash_algorithm='improved')
+
+# Generate a keypair
+private_key, public_key = lamport.generate_keypair()
 
 # Sign a message
-message = b"Sign this quantum-resistant message"
-signature_value = signature.sign(message, private_key)
+message = "Transfer 10 tokens to Alice"
+signature = lamport.sign(message, private_key)
 
 # Verify the signature
-is_valid = signature.verify(message, signature_value, public_key)
+is_valid = lamport.verify(message, signature, public_key)
+print(f"Signature valid: {is_valid}")
+</code></pre>
+
+            <h4>Dilithium Signatures</h4>
+            <p>A lattice-based post-quantum digital signature scheme.</p>
+            <pre><code>from src.quantum_hash.signatures.dilithium import DilithiumSignature
+
+# Create a Dilithium signature instance
+dilithium = DilithiumSignature(security_level=1)
+
+# Generate a keypair
+private_key, public_key = dilithium.generate_keypair()
+
+# Sign a message
+message = "Quantum-resistant signature"
+signature = dilithium.sign(message, private_key)
+
+# Verify the signature
+is_valid = dilithium.verify(message, signature, public_key)
 print(f"Signature valid: {is_valid}")
 </code></pre>
         </section>
 
         <section>
+            <h3>Key Encapsulation Mechanism (KEM)</h3>
+            <h4>Kyber</h4>
+            <p>A lattice-based key encapsulation mechanism for secure key exchange.</p>
+            <pre><code>from src.quantum_hash.kem.kyber import Kyber
+
+# Create a Kyber instance
+kyber = Kyber(security_level=1)
+
+# Generate a keypair
+private_key, public_key = kyber.generate_keypair()
+
+# Encapsulate - generates a shared secret and ciphertext
+ciphertext, shared_secret = kyber.encapsulate(public_key)
+
+# Decapsulate - recovers the shared secret using private key and ciphertext
+recovered_secret = kyber.decapsulate(private_key, ciphertext)
+
+# Check if the secrets match
+is_match = (shared_secret == recovered_secret)
+print(f"Secrets match: {is_match}")
+</code></pre>
+        </section>
+
+        <section>
+            <h3>API Usage</h3>
+            <p>You can also use our API directly. Example with curl:</p>
+            <pre><code># Compare multiple hash algorithms
+curl -X POST 'https://dirac-hashes.onrender.com/api/hash/compare' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "message":"I am groot",
+    "algorithms":["improved","grover","shor"],
+    "encoding":"utf-8"
+  }' | python -m json.tool</code></pre>
+        </section>
+
+        <section>
+            <h3>Frequently Asked Questions</h3>
+            
+            <div class="faq-item">
+                <h4>What makes a hash function quantum-resistant?</h4>
+                <p>
+                    Traditional hash functions may be vulnerable to quantum computers running Grover's algorithm, which can find collisions or pre-images with a quadratic speedup compared to classical computers. Quantum-resistant hash functions are designed with larger output sizes and internal structures that mitigate this advantage.
+                </p>
+            </div>
+            
+            <div class="faq-item">
+                <h4>How do Dirac Hashes differ from traditional hash functions?</h4>
+                <p>
+                    Dirac Hashes incorporate quantum-inspired mechanisms that simulate quantum effects like superposition and entanglement. While these are classical implementations, they're designed to be resistant to both classical and quantum cryptanalysis techniques.
+                </p>
+            </div>
+            
+            <div class="faq-item">
+                <h4>What is the Avalanche Effect in hash functions?</h4>
+                <p>
+                    The Avalanche Effect refers to the property where a small change in the input (even a single bit) results in a significant change in the output hash (ideally changing about 50% of the output bits). This property ensures that similar inputs produce completely different hashes, which is crucial for security.
+                </p>
+            </div>
+            
+            <div class="faq-item">
+                <h4>What is the difference between the 'improved', 'grover', and 'shor' hash algorithms?</h4>
+                <p>
+                    <strong>Improved</strong>: Our optimized algorithm that provides the best security-performance balance.<br>
+                    <strong>Grover</strong>: Inspired by Grover's search algorithm, designed to resist quantum search attacks.<br>
+                    <strong>Shor</strong>: Inspired by Shor's period-finding algorithm, with enhanced resistance to algebraic attacks.
+                </p>
+            </div>
+            
+            <div class="faq-item">
+                <h4>How secure are post-quantum signatures compared to traditional ones?</h4>
+                <p>
+                    Post-quantum signatures like Dilithium and Lamport are designed to resist attacks by quantum computers. Traditional signatures based on RSA or ECC can be broken by a sufficiently powerful quantum computer using Shor's algorithm. Our post-quantum signatures provide comparable security levels to traditional methods against classical computers, with the added benefit of quantum resistance.
+                </p>
+            </div>
+            
+            <div class="faq-item">
+                <h4>Which hash algorithm should I use for my application?</h4>
+                <p>
+                    For most applications, we recommend using the 'improved' algorithm, which provides the best balance of security, performance, and quantum resistance. If you're specifically concerned about quantum attacks, the 'grover' variant may provide additional security margins.
+                </p>
+            </div>
+        </section>
+
+        <section>
             <h3>API Reference</h3>
-            <p>For detailed API documentation, please refer to the <a href="https://github.com/mk0dz/dirac-hashes">GitHub repository</a>.</p>
+            <p>For detailed API documentation, please refer to our <a href="info/README.md">API Guide</a> or the <a href="https://github.com/mk0dz/dirac-hashes">GitHub repository</a>.</p>
         </section>
     </main>
 

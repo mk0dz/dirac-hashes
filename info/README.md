@@ -25,6 +25,184 @@ The library includes:
   - Kyber (key encapsulation mechanism)
   - Dilithium (general-purpose signatures)
 
+## API Usage Guide
+
+Our API is live at `https://dirac-hashes.onrender.com`. Here are practical examples for using each feature:
+
+### Hash Functions
+
+#### Compare Multiple Hash Algorithms
+
+```bash
+curl -X POST 'https://dirac-hashes.onrender.com/api/hash/compare' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{"message":"I am groot","algorithms":["improved","grover","shor"],"encoding":"utf-8"}' | python -m json.tool
+```
+
+Response:
+```json
+{
+  "message": "I am groot",
+  "results": {
+    "improved": "a62a8045cd4cde9d7e38e9ce9ee95a58d97a31fc12c735959a6cd3aadfb07cde",
+    "grover": "b73e4f7c84b12e7d1e38a9ca7ee15a46d87f41fc31c724958a5cd2badfb18cde",
+    "shor": "c94f5e8d73c21f8e2f39b8db8ff25b35e98f52ed42d813847b6de1cadec29def"
+  }
+}
+```
+
+#### Generate a Single Hash
+
+```bash
+curl -X POST 'https://dirac-hashes.onrender.com/api/hash/generate' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{"message":"Quantum supremacy","algorithm":"improved","encoding":"utf-8"}' | python -m json.tool
+```
+
+### Digital Signatures
+
+#### Generate a Signature Keypair
+
+```bash
+curl -X POST 'https://dirac-hashes.onrender.com/api/signatures/keypair' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{"scheme":"dilithium","hash_algorithm":"improved","security_level":1}' | python -m json.tool
+```
+
+Save the returned `public_key` and `private_key` for the next steps.
+
+#### Sign a Message
+
+```bash
+curl -X POST 'https://dirac-hashes.onrender.com/api/signatures/sign' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "message": "Sign this secure message",
+    "private_key": "YOUR_PRIVATE_KEY_FROM_PREVIOUS_STEP",
+    "scheme": "dilithium",
+    "hash_algorithm": "improved"
+  }' | python -m json.tool
+```
+
+Save the returned `signature` for verification.
+
+#### Verify a Signature
+
+```bash
+curl -X POST 'https://dirac-hashes.onrender.com/api/signatures/verify' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "message": "Sign this secure message",
+    "signature": "YOUR_SIGNATURE_FROM_PREVIOUS_STEP",
+    "public_key": "YOUR_PUBLIC_KEY_FROM_KEYPAIR_STEP",
+    "scheme": "dilithium",
+    "hash_algorithm": "improved"
+  }' | python -m json.tool
+```
+
+### Key Encapsulation Mechanism (KEM)
+
+#### Generate a KEM Keypair
+
+```bash
+curl -X POST 'https://dirac-hashes.onrender.com/api/kem/keypair' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{"scheme":"kyber","hash_algorithm":"improved","security_level":1}' | python -m json.tool
+```
+
+Save the returned `public_key` and `private_key` for the next steps.
+
+#### Encapsulate a Shared Secret
+
+```bash
+curl -X POST 'https://dirac-hashes.onrender.com/api/kem/encapsulate' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "public_key": "YOUR_PUBLIC_KEY_FROM_PREVIOUS_STEP",
+    "scheme": "kyber",
+    "hash_algorithm": "improved"
+  }' | python -m json.tool
+```
+
+Save the returned `ciphertext` and `shared_secret` for the next step.
+
+#### Decapsulate to Retrieve the Shared Secret
+
+```bash
+curl -X POST 'https://dirac-hashes.onrender.com/api/kem/decapsulate' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "private_key": "YOUR_PRIVATE_KEY_FROM_KEYPAIR_STEP",
+    "ciphertext": "YOUR_CIPHERTEXT_FROM_PREVIOUS_STEP",
+    "scheme": "kyber",
+    "hash_algorithm": "improved"
+  }' | python -m json.tool
+```
+
+### Real-World Example: End-to-End Secure Communication
+
+This example demonstrates a complete workflow for secure communication:
+
+1. **Generate KEM keypair for recipient:**
+```bash
+curl -X POST 'https://dirac-hashes.onrender.com/api/kem/keypair' \
+  -H 'Content-Type: application/json' \
+  -d '{"scheme":"kyber","hash_algorithm":"improved","security_level":1}' > recipient_keys.json
+```
+
+2. **Sender encapsulates a shared secret using recipient's public key:**
+```bash
+recipient_public_key=$(cat recipient_keys.json | jq -r '.public_key')
+curl -X POST 'https://dirac-hashes.onrender.com/api/kem/encapsulate' \
+  -H 'Content-Type: application/json' \
+  -d "{\"public_key\":\"$recipient_public_key\",\"scheme\":\"kyber\",\"hash_algorithm\":\"improved\"}" > encapsulation.json
+```
+
+3. **Sender signs the encrypted message with their own signature key:**
+```bash
+curl -X POST 'https://dirac-hashes.onrender.com/api/signatures/keypair' \
+  -H 'Content-Type: application/json' \
+  -d '{"scheme":"dilithium","hash_algorithm":"improved","security_level":1}' > sender_sig_keys.json
+
+sender_private_key=$(cat sender_sig_keys.json | jq -r '.private_key')
+shared_secret=$(cat encapsulation.json | jq -r '.shared_secret')
+ciphertext=$(cat encapsulation.json | jq -r '.ciphertext')
+
+# Create a message containing the encrypted data (in real system, you'd encrypt with the shared secret)
+message="Encrypted data: $ciphertext"
+
+curl -X POST 'https://dirac-hashes.onrender.com/api/signatures/sign' \
+  -H 'Content-Type: application/json' \
+  -d "{\"message\":\"$message\",\"private_key\":\"$sender_private_key\",\"scheme\":\"dilithium\",\"hash_algorithm\":\"improved\"}" > signed_message.json
+```
+
+4. **Recipient verifies sender's signature:**
+```bash
+sender_public_key=$(cat sender_sig_keys.json | jq -r '.public_key')
+signature=$(cat signed_message.json | jq -r '.signature')
+
+curl -X POST 'https://dirac-hashes.onrender.com/api/signatures/verify' \
+  -H 'Content-Type: application/json' \
+  -d "{\"message\":\"$message\",\"signature\":\"$signature\",\"public_key\":\"$sender_public_key\",\"scheme\":\"dilithium\",\"hash_algorithm\":\"improved\"}" > verification.json
+```
+
+5. **Recipient decapsulates the shared secret:**
+```bash
+recipient_private_key=$(cat recipient_keys.json | jq -r '.private_key')
+
+curl -X POST 'https://dirac-hashes.onrender.com/api/kem/decapsulate' \
+  -H 'Content-Type: application/json' \
+  -d "{\"private_key\":\"$recipient_private_key\",\"ciphertext\":\"$ciphertext\",\"scheme\":\"kyber\",\"hash_algorithm\":\"improved\"}" > decapsulation.json
+```
+
 ## Project Structure
 
 - **src/**: Source code for the Dirac Hashes library
