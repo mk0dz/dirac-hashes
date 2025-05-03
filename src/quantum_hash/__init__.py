@@ -5,7 +5,7 @@ This package provides quantum-inspired hash functions and key generation
 algorithms designed to be resistant to quantum computing attacks.
 """
 
-__version__ = '0.1.4'
+__version__ = '0.1.3'
 __author__ = 'Quantum Hash Team'
 __email__ = 'example@example.com'
 __license__ = 'MIT'
