@@ -122,7 +122,7 @@ jobs:
           
           # Update version in setup.py if it exists
           if [ -f "setup.py" ]; then
-            sed -i "s/version=\"$current_version\"/version=\"$new_version\"/" setup.py
+            sed -i "s/VERSION = '$current_version'/VERSION = '$new_version'/" setup.py
           fi
           
           # Output new version
@@ -165,20 +165,30 @@ jobs:
         with:
           python-version: "3.10"
       
-      - name: Install dependencies
+      - name: Install build dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install build
+          pip install build setuptools wheel
+          pip install numpy scipy  # Required for C extensions to build correctly
 
-      - name: Build release distributions
+      - name: Build source distribution
         run: |
-          python -m build
+          python -m build --sdist
 
+      - name: Build wheels for multiple platforms
+        uses: pypa/cibuildwheel@v2.16.2
+        env:
+          CIBW_BUILD: "cp38-* cp39-* cp310-* cp311-*"
+          CIBW_SKIP: "*-musllinux*"
+          CIBW_BEFORE_BUILD: "pip install numpy scipy"
+      
       - name: Upload distributions
         uses: actions/upload-artifact@v4
         with:
           name: release-dists
-          path: dist/
+          path: |
+            dist/
+            wheelhouse/
       
       - name: Create GitHub Release
         if: needs.version-bump.outputs.tag_exists != 'true'
@@ -189,6 +199,7 @@ jobs:
           generate_release_notes: true
           files: |
             dist/*
+            wheelhouse/*
 
   pypi-publish:
     runs-on: ubuntu-latest
@@ -205,7 +216,16 @@ jobs:
           name: release-dists
           path: dist/
 
+      - name: Prepare all packages for PyPI
+        run: |
+          mkdir -p packages
+          cp dist/*.tar.gz packages/
+          cp dist/*.whl packages/ || true
+          cp wheelhouse/*.whl packages/ || true
+          ls -la packages/
+
       - name: Publish release distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          packages-dir: dist/
+          packages-dir: packages/
+          skip-existing: true

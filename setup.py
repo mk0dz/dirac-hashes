@@ -10,6 +10,13 @@ import os
 import sys
 import platform
 
+# Get version from __init__.py
+with open('src/quantum_hash/__init__.py', 'r') as f:
+    for line in f:
+        if line.startswith('__version__'):
+            VERSION = line.strip().split('=')[1].strip(" '\"")
+            break
+
 # Detect if we're on x86 architecture to enable SSE/AVX optimizations
 is_x86 = platform.machine().lower() in ['x86_64', 'amd64', 'i386', 'i686']
 
@@ -44,6 +51,7 @@ hybrid_core = Extension(
 requirements = [
     'numpy>=1.18.0',
     'scipy>=1.4.0',
+    'numba>=0.50.0',
 ]
 
 try:
@@ -56,18 +64,15 @@ except ImportError:
 with open('README.md', 'r', encoding='utf-8') as f:
     long_description = f.read()
 
-# Version information
-VERSION = '0.1.4'  # Updated version
-
 setup(
     name='dirac-hashes',
     version=VERSION,
     description='Quantum-Resistant Cryptographic Hash Functions',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    author='Your Name',
-    author_email='your.email@example.com',
-    url='https://github.com/yourusername/dirac-hashes',
+    author='Quantum Hash Team',
+    author_email='example@example.com',
+    url='https://github.com/mk0dz/dirac-hashes',
     package_dir={'quantum_hash': 'src/quantum_hash'},  # Map the quantum_hash package to src/quantum_hash directory
     packages=['quantum_hash'] + ['quantum_hash.' + p for p in find_packages(where='src/quantum_hash')],
     install_requires=requirements,
@@ -80,13 +85,16 @@ setup(
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
         'Programming Language :: C',
         'Topic :: Security :: Cryptography',
     ],
     python_requires='>=3.7',
-    keywords='cryptography, post-quantum, hash-functions, signatures',
+    keywords='cryptography, post-quantum, hash-functions, signatures, blockchain',
     project_urls={
-        'Bug Reports': 'https://github.com/yourusername/dirac-hashes/issues',
-        'Source': 'https://github.com/yourusername/dirac-hashes',
+        'Bug Reports': 'https://github.com/mk0dz/dirac-hashes/issues',
+        'Source': 'https://github.com/mk0dz/dirac-hashes',
+        'Documentation': 'https://dirac-hashes.vercel.app/',
     },
 )
