@@ -1,20 +1,23 @@
 """
-Routes for hash function API endpoints.
+Hash Routes for the Dirac Hashes API.
+
+This module provides endpoints for the hash functionality of the Dirac Hashes API.
 """
 
 import time
 import binascii
 import hashlib
 from fastapi import APIRouter, HTTPException, Body
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Union
 import base64
 
-from src.quantum_hash.dirac import DiracHash
-from api.models.hash_models import (
+from quantum_hash.dirac import DiracHash
+from web.api.models.hash_models import (
     HashRequest, 
     HashResponse, 
     HashComparisonRequest,
-    HashComparisonResponse
+    HashComparisonResponse,
+    HashAlgorithm
 )
 
 router = APIRouter()
@@ -66,7 +69,7 @@ async def generate_hash(request: HashRequest):
 
 @router.post("/compare", response_model=HashComparisonResponse)
 async def compare_hashes(request: HashComparisonRequest):
-    """Compare multiple hash algorithms on the same input message."""
+    """Compare multiple hash algorithms on the same input."""
     try:
         # Parse message
         message_bytes = parse_message(request.message, request.encoding)

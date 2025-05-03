@@ -66,6 +66,27 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize dashboard charts
     initDashboardCharts();
+    
+    // Tab functionality
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            // Remove active class from all buttons and content
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            // Add active class to clicked button
+            btn.classList.add('active');
+            
+            // Show corresponding content
+            const tabId = btn.getAttribute('data-tab');
+            document.getElementById(`${tabId}-tab`).classList.add('active');
+        });
+    });
+    
+    // Initialize charts
+    initializeCharts();
 });
 
 // Navigation between pages
@@ -1155,6 +1176,275 @@ function setupDecapsulateForm() {
         } catch (error) {
             showError('decapsulateResult', error, 'Failed to decapsulate shared secret.');
             document.getElementById('decapsulateDetails').classList.add('d-none');
+        }
+    });
+}
+
+// Benchmark tabs functionality
+function initializeCharts() {
+    // Performance chart
+    const perfCtx = document.getElementById('hashPerformanceChart').getContext('2d');
+    new Chart(perfCtx, {
+        type: 'bar',
+        data: {
+            labels: ['16 bytes', '64 bytes', '256 bytes', '1024 bytes', '4096 bytes'],
+            datasets: [
+                {
+                    label: 'improved',
+                    data: [0.003, 0.005, 0.007, 0.008, 0.008],
+                    backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'grover',
+                    data: [0.023, 0.094, 0.362, 1.421, 5.857],
+                    backgroundColor: 'rgba(255, 99, 132, 0.7)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'shor',
+                    data: [0.247, 0.657, 0.999, 1.053, 1.142],
+                    backgroundColor: 'rgba(75, 192, 192, 0.7)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'hybrid',
+                    data: [0.021, 0.080, 0.253, 0.608, 0.957],
+                    backgroundColor: 'rgba(153, 102, 255, 0.7)',
+                    borderColor: 'rgba(153, 102, 255, 1)',
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            scales: {
+                y: {
+                    type: 'logarithmic',
+                    title: {
+                        display: true,
+                        text: 'Speed (MB/s) - log scale'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Input Size'
+                    }
+                }
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Hash Algorithm Performance by Input Size'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `${context.dataset.label}: ${context.raw} MB/s`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+    
+    // Security metrics chart
+    const securityCtx = document.getElementById('hashSecurityChart').getContext('2d');
+    new Chart(securityCtx, {
+        type: 'radar',
+        data: {
+            labels: ['Avalanche Effect', 'Entropy', 'Collision Resistance', 'Distribution Uniformity'],
+            datasets: [
+                {
+                    label: 'improved',
+                    data: [99.86, 98.47, 100, 97.43],
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    pointBackgroundColor: 'rgba(54, 162, 235, 1)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgba(54, 162, 235, 1)'
+                },
+                {
+                    label: 'grover',
+                    data: [98.62, 98.27, 100, 96.12],
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    pointBackgroundColor: 'rgba(255, 99, 132, 1)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgba(255, 99, 132, 1)'
+                },
+                {
+                    label: 'hybrid',
+                    data: [99.74, 98.22, 100, 97.85],
+                    backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                    borderColor: 'rgba(153, 102, 255, 1)',
+                    pointBackgroundColor: 'rgba(153, 102, 255, 1)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgba(153, 102, 255, 1)'
+                },
+                {
+                    label: 'SHA-256',
+                    data: [99.32, 98.37, 100, 100],
+                    backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                    borderColor: 'rgba(255, 159, 64, 1)',
+                    pointBackgroundColor: 'rgba(255, 159, 64, 1)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgba(255, 159, 64, 1)'
+                }
+            ]
+        },
+        options: {
+            elements: {
+                line: {
+                    borderWidth: 3
+                }
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Security Properties Comparison (normalized %)'
+                }
+            },
+            scales: {
+                r: {
+                    angleLines: {
+                        display: true
+                    },
+                    suggestedMin: 80,
+                    suggestedMax: 100
+                }
+            }
+        }
+    });
+    
+    // Signature performance chart
+    const sigPerfCtx = document.getElementById('signaturePerformanceChart').getContext('2d');
+    new Chart(sigPerfCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Key Generation', 'Signing', 'Verification'],
+            datasets: [
+                {
+                    label: 'Lamport (grover)',
+                    data: [0.673, 0.001, 0.043],
+                    backgroundColor: 'rgba(255, 99, 132, 0.7)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Dilithium (level1)',
+                    data: [0.109, 0.284, 0.0001],
+                    backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'SPHINCS+',
+                    data: [5.346, 28.340, 24.922],
+                    backgroundColor: 'rgba(75, 192, 192, 0.7)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            scales: {
+                y: {
+                    type: 'logarithmic',
+                    title: {
+                        display: true,
+                        text: 'Time (seconds) - log scale'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Operation'
+                    }
+                }
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Signature Scheme Performance'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `${context.dataset.label}: ${context.raw}s`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+    
+    // Signature size chart
+    const sigSizeCtx = document.getElementById('signatureSizeChart').getContext('2d');
+    new Chart(sigSizeCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Lamport', 'Dilithium', 'SPHINCS+'],
+            datasets: [
+                {
+                    label: 'Private Key (KB)',
+                    data: [16.0, 5.1, 0.09],
+                    backgroundColor: 'rgba(255, 99, 132, 0.7)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Public Key (KB)',
+                    data: [16.0, 3.0, 0.06],
+                    backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Signature (KB)',
+                    data: [2.2, 3.2, 8.2],
+                    backgroundColor: 'rgba(75, 192, 192, 0.7)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            scales: {
+                y: {
+                    type: 'logarithmic',
+                    title: {
+                        display: true,
+                        text: 'Size (KB) - log scale'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Signature Scheme'
+                    }
+                }
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Key and Signature Sizes'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `${context.dataset.label}: ${context.raw} KB`;
+                        }
+                    }
+                }
+            }
         }
     });
 } 

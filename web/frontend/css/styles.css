@@ -522,4 +522,126 @@ pre.code-block {
     .algorithm-selector {
         flex-direction: column;
     }
+}
+
+/* Benchmark Tables */
+.benchmark-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: 0.9rem;
+}
+
+.benchmark-table th,
+.benchmark-table td {
+    padding: 0.75rem;
+    text-align: center;
+    border: 1px solid var(--border-color);
+}
+
+.benchmark-table th {
+    background-color: var(--primary-color);
+    color: white;
+    font-weight: bold;
+}
+
+.benchmark-table tr:nth-child(even) {
+    background-color: var(--bg-alt);
+}
+
+.benchmark-table tr.highlight {
+    background-color: rgba(76, 175, 80, 0.1);
+    font-weight: bold;
+}
+
+.benchmark-table tr:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.benchmark-table td:first-child {
+    font-weight: bold;
+    text-align: left;
+}
+
+.benchmark-note {
+    font-style: italic;
+    color: var(--text-secondary);
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+}
+
+/* Tabs */
+.tabs {
+    margin: 2rem 0;
+}
+
+.tab-header {
+    display: flex;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.tab-btn {
+    padding: 0.75rem 1.5rem;
+    cursor: pointer;
+    background-color: var(--bg-color);
+    border: 1px solid var(--border-color);
+    border-bottom: none;
+    border-radius: 0.25rem 0.25rem 0 0;
+    margin-right: 0.25rem;
+    transition: all 0.3s ease;
+}
+
+.tab-btn.active {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+.tab-content {
+    display: none;
+    padding: 1.5rem;
+    border: 1px solid var(--border-color);
+    border-top: none;
+    border-radius: 0 0 0.25rem 0.25rem;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+.graph-container {
+    border: 1px solid var(--border-color);
+    padding: 1rem;
+    border-radius: 0.25rem;
+    background-color: white;
+}
+
+.mt-20 {
+    margin-top: 1.25rem;
+}
+
+@media (max-width: 768px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .tab-btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+    
+    .benchmark-table {
+        font-size: 0.8rem;
+    }
+    
+    .benchmark-table th,
+    .benchmark-table td {
+        padding: 0.5rem;
+    }
 } 

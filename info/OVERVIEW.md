@@ -116,7 +116,7 @@ As of version 0.1.4, we have:
 
 ## Latest Benchmark Results
 
-Our latest benchmark (May 2023) shows significant improvement from previous versions:
+Our latest benchmark (May 2025) shows significant improvement from previous versions:
 
 ### Hash Function Performance
 

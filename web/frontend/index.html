@@ -131,6 +131,196 @@ digest = DiracHash.hash(message, algorithm="improved")
 print(digest.hex())
                 </div>
             </section>
+            
+            <section class="section">
+                <h3 class="section-title">Latest Benchmark Results</h3>
+                <p>Our latest optimization efforts have resulted in significant performance improvements while maintaining strong security properties.</p>
+                
+                <div class="tabs">
+                    <div class="tab-header">
+                        <div class="tab-btn active" data-tab="performance">Performance</div>
+                        <div class="tab-btn" data-tab="security">Security</div>
+                        <div class="tab-btn" data-tab="signature">Signatures</div>
+                    </div>
+                    
+                    <div class="tab-content active" id="performance-tab">
+                        <h4 class="section-subtitle">Hash Function Performance (MB/s)</h4>
+                        <table class="benchmark-table">
+                            <thead>
+                                <tr>
+                                    <th>Algorithm</th>
+                                    <th>16 bytes</th>
+                                    <th>64 bytes</th>
+                                    <th>256 bytes</th>
+                                    <th>1024 bytes</th>
+                                    <th>4096 bytes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>improved</td>
+                                    <td>0.003</td>
+                                    <td>0.005</td>
+                                    <td>0.007</td>
+                                    <td>0.008</td>
+                                    <td>0.008</td>
+                                </tr>
+                                <tr class="highlight">
+                                    <td>grover</td>
+                                    <td>0.023</td>
+                                    <td>0.094</td>
+                                    <td>0.362</td>
+                                    <td>1.421</td>
+                                    <td>5.857</td>
+                                </tr>
+                                <tr>
+                                    <td>shor</td>
+                                    <td>0.247</td>
+                                    <td>0.657</td>
+                                    <td>0.999</td>
+                                    <td>1.053</td>
+                                    <td>1.142</td>
+                                </tr>
+                                <tr>
+                                    <td>hybrid</td>
+                                    <td>0.021</td>
+                                    <td>0.080</td>
+                                    <td>0.253</td>
+                                    <td>0.608</td>
+                                    <td>0.957</td>
+                                </tr>
+                                <tr>
+                                    <td>SHA-256</td>
+                                    <td>42.667</td>
+                                    <td>165.161</td>
+                                    <td>519.797</td>
+                                    <td>1098.123</td>
+                                    <td>1488.102</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <p class="benchmark-note">Grover variant shows 10x performance improvement in our latest version.</p>
+                    </div>
+                    
+                    <div class="tab-content" id="security-tab">
+                        <h4 class="section-subtitle">Security Metrics</h4>
+                        <table class="benchmark-table">
+                            <thead>
+                                <tr>
+                                    <th>Algorithm</th>
+                                    <th>Avalanche Effect</th>
+                                    <th>Entropy</th>
+                                    <th>Chi-Square</th>
+                                    <th>Collisions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>improved</td>
+                                    <td>49.93%</td>
+                                    <td>6.302</td>
+                                    <td>262.24</td>
+                                    <td>0</td>
+                                </tr>
+                                <tr>
+                                    <td>grover</td>
+                                    <td>49.31%</td>
+                                    <td>6.289</td>
+                                    <td>267.36</td>
+                                    <td>0</td>
+                                </tr>
+                                <tr class="highlight">
+                                    <td>hybrid</td>
+                                    <td>50.13%</td>
+                                    <td>6.286</td>
+                                    <td>254.56</td>
+                                    <td>0</td>
+                                </tr>
+                                <tr>
+                                    <td>SHA-256</td>
+                                    <td>50.34%</td>
+                                    <td>6.296</td>
+                                    <td>246.88</td>
+                                    <td>0</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <p class="benchmark-note">All algorithms now exhibit near-ideal avalanche effect of ~50%.</p>
+                    </div>
+                    
+                    <div class="tab-content" id="signature-tab">
+                        <h4 class="section-subtitle">Signature Performance</h4>
+                        <table class="benchmark-table">
+                            <thead>
+                                <tr>
+                                    <th>Scheme</th>
+                                    <th>Variant</th>
+                                    <th>Key Gen Time</th>
+                                    <th>Sign Time</th>
+                                    <th>Verify Time</th>
+                                    <th>Signature Size</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Lamport</td>
+                                    <td>grover</td>
+                                    <td>0.673s</td>
+                                    <td>0.001s</td>
+                                    <td>0.043s</td>
+                                    <td>2.2 KB</td>
+                                </tr>
+                                <tr class="highlight">
+                                    <td>Dilithium</td>
+                                    <td>level1</td>
+                                    <td>0.109s</td>
+                                    <td>0.284s</td>
+                                    <td>~0s</td>
+                                    <td>3.2 KB</td>
+                                </tr>
+                                <tr>
+                                    <td>SPHINCS+</td>
+                                    <td>default</td>
+                                    <td>5.346s</td>
+                                    <td>28.340s</td>
+                                    <td>24.922s</td>
+                                    <td>8.2 KB</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <p class="benchmark-note">Dilithium offers the best overall performance, while Lamport provides fastest signing operations.</p>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="section">
+                <h3 class="section-title">Visualize Hash Comparison</h3>
+                <p>View detailed performance and security metrics for our hash algorithms.</p>
+                
+                <div class="grid">
+                    <div class="graph-container">
+                        <h4 class="section-subtitle">Performance Comparison</h4>
+                        <canvas id="hashPerformanceChart"></canvas>
+                    </div>
+                    
+                    <div class="graph-container">
+                        <h4 class="section-subtitle">Security Metrics</h4>
+                        <canvas id="hashSecurityChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="grid mt-20">
+                    <div class="graph-container">
+                        <h4 class="section-subtitle">Signature Performance</h4>
+                        <canvas id="signaturePerformanceChart"></canvas>
+                    </div>
+                    
+                    <div class="graph-container">
+                        <h4 class="section-subtitle">Key/Signature Sizes</h4>
+                        <canvas id="signatureSizeChart"></canvas>
+                    </div>
+                </div>
+            </section>
         </div>
         
         <!-- Stats Page -->

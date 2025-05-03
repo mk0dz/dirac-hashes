@@ -1,11 +1,11 @@
 """
-Data models for digital signature API endpoints.
+Data models for signature API endpoints.
 """
 
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict, Any
 from enum import Enum
-from api.models.hash_models import HashAlgorithm
+from web.api.models.hash_models import HashAlgorithm
 
 
 class SignatureScheme(str, Enum):
