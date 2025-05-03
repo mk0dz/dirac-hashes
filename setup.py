@@ -57,7 +57,7 @@ with open('README.md', 'r', encoding='utf-8') as f:
     long_description = f.read()
 
 # Version information
-VERSION = '1.0.1'  # Updated version
+VERSION = '0.1.4'  # Updated version
 
 setup(
     name='dirac-hashes',
