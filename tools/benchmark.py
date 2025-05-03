@@ -367,7 +367,12 @@ class Benchmark:
             # Calculate sizes
             private_key_size = sum(len(private_key[i][bit]) for i in range(256) for bit in [0, 1])
             public_key_size = sum(len(public_key[i][bit]) for i in range(256) for bit in [0, 1])
-            signature_size = sum(len(sig) for sig in signature)
+            
+            # Handle both list and bytes signature formats
+            if isinstance(signature, (bytes, bytearray)):
+                signature_size = len(signature)
+            else:
+                signature_size = sum(len(sig) for sig in signature)
             
             results['lamport'][algo] = {
                 'key_gen_time': key_gen_time,

@@ -20,8 +20,13 @@ class TestLamportSignature(unittest.TestCase):
         private_key, public_key = self.lamport.generate_keypair()
         
         # Verify the structure of the keys
-        self.assertEqual(len(private_key), 256)  # 32 bytes * 8 bits = 256 bits
-        self.assertEqual(len(public_key), 256)
+        # Now we have 256 bit positions plus '_metadata' field
+        self.assertEqual(len(private_key) - 1, 256)  # 32 bytes * 8 bits = 256 bits
+        self.assertEqual(len(public_key) - 1, 256)
+        
+        # Verify the _metadata field exists
+        self.assertIn('_metadata', private_key)
+        self.assertIn('_metadata', public_key)
         
         # Check a few sample key entries
         for i in range(0, 256, 32):  # Check every 32nd position
@@ -64,12 +69,24 @@ class TestLamportSignature(unittest.TestCase):
         """Test that tampering with the signature causes verification failure."""
         signature = self.lamport.sign(self.test_message, self.private_key)
         
-        # Tamper with the signature by modifying one component
-        tampered_signature = signature.copy()
-        tampered_signature[0] = b"\x00" * 32  # Replace first component with zeros
+        # Handle both list and bytes/bytearray formats
+        if isinstance(signature, (bytes, bytearray)):
+            # For compact signatures (bytes format)
+            tampered_signature = bytearray(signature)
+            # Modify a byte in the signature (after the header)
+            # Find location of a key in the signature (after magic, digest, positions, and bit values)
+            # Assuming 2 bytes magic + 32 bytes digest + 64*2 bytes positions + 64 bytes bit values
+            key_start = 2 + 32 + 64*2 + 64
+            # Change the first byte of the first key
+            if len(tampered_signature) > key_start:
+                tampered_signature[key_start] = (tampered_signature[key_start] + 1) % 256
+        else:
+            # For standard signatures (list format)
+            tampered_signature = signature.copy()
+            tampered_signature[0] = b"\x00" * 32  # Replace first component with zeros
         
         # Verify the tampered signature should fail
-        self.assertFalse(self.lamport.verify(self.test_message, tampered_signature, self.public_key))
+        self.assertFalse(self.lamport.verify(self.test_message, bytes(tampered_signature) if isinstance(tampered_signature, bytearray) else tampered_signature, self.public_key))
     
     def test_different_hash_algorithms(self):
         """Test signing and verification with different hash algorithms."""
