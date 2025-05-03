@@ -167,51 +167,32 @@ jobs:
         with:
           python-version: "3.10"
       
-      - name: Install build dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install build setuptools wheel
-          # Install numpy and scipy from wheels to avoid compilation
-          pip install --only-binary=numpy,scipy numpy scipy
-
       - name: Build source distribution
         run: |
-          python -m build --sdist
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade setuptools wheel
+          python setup.py sdist
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.9'
-          
-      - name: Create setup.cfg for build
+      - name: Build wheels directly
         run: |
-          echo "[metadata]" > setup.cfg
-          echo "name = dirac-hashes" >> setup.cfg
-          echo "[build_ext]" >> setup.cfg
-          echo "inplace = 1" >> setup.cfg
+          # Install build dependencies
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade setuptools wheel
+          python -m pip install --only-binary=numpy,scipy numpy scipy
           
-      - name: Build wheels for multiple platforms
-        uses: pypa/cibuildwheel@v2.16.2
-        env:
-            CIBW_BUILD: "cp38-* cp39-* cp310-* cp311-*"
-            CIBW_SKIP: "*-musllinux*"
-            CIBW_BEFORE_BUILD: "pip install --only-binary=numpy,scipy numpy scipy"
-            CIBW_ENVIRONMENT: "PIP_PREFER_BINARY=1 PIP_DISABLE_PIP_VERSION_CHECK=1"
-            CIBW_BUILD_VERBOSITY: 3
-            CIBW_PROJECT_REQUIRES_PYTHON: ">=3.7"
-            CIBW_REPAIR_WHEEL_COMMAND: ""
-            CIBW_BEFORE_ALL: |
-              python -m pip install --upgrade pip
-              python -m pip install --upgrade setuptools wheel
-            CIBW_TEST_SKIP: "*_musllinux* *-win32"
-      
+          # Build wheel using setuptools directly 
+          python setup.py bdist_wheel
+          
+          # List all built packages
+          echo "Built packages:"
+          ls -la dist/
+
       - name: Upload distributions
         uses: actions/upload-artifact@v4
         with:
           name: release-dists
           path: |
             dist/
-            wheelhouse/
       
       - name: Create GitHub Release
         if: needs.version-bump.outputs.tag_exists != 'true'
@@ -222,7 +203,6 @@ jobs:
           generate_release_notes: true
           files: |
             dist/*
-            wheelhouse/*
 
   pypi-publish:
     runs-on: ubuntu-latest
@@ -244,7 +224,6 @@ jobs:
           mkdir -p packages
           cp dist/*.tar.gz packages/
           cp dist/*.whl packages/ || true
-          cp wheelhouse/*.whl packages/ || true
           ls -la packages/
 
       - name: Publish release distributions to PyPI

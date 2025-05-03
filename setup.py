@@ -71,9 +71,6 @@ except ImportError:
 with open(here / 'README.md', 'r', encoding='utf-8') as f:
     long_description = f.read()
 
-# Find all packages
-packages = ['quantum_hash'] + ['quantum_hash.' + p for p in find_packages(where='src/quantum_hash')]
-
 setup(
     name='dirac-hashes',
     version=VERSION,
@@ -83,10 +80,10 @@ setup(
     author='Quantum Hash Team',
     author_email='example@example.com',
     url='https://github.com/mk0dz/dirac-hashes',
-    package_dir={'': 'src'},  # Specify src as the root directory for all packages
-    packages=find_packages(where='src'),  # Find all packages in src
+    package_dir={'': 'src'},
+    packages=find_packages(where='src'),
     package_data={
-        'quantum_hash': ['*.c', '*.h', 'core/*.c', 'core/*.h'],  # Include C source and header files
+        'quantum_hash': ['*.c', '*.h', 'core/*.c', 'core/*.h'],
     },
     include_package_data=True,
     install_requires=requirements,
