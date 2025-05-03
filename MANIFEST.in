@@ -2,12 +2,25 @@ include LICENSE
 include README.md
 include CHANGELOG.md
 include requirements.txt
+include setup.py
+include setup.cfg
+include pyproject.toml
 
 recursive-include examples *.py
 recursive-include examples *.md
 
 recursive-include src/quantum_hash *.py
 recursive-include src/quantum_hash/tests *.py
+
+recursive-include src *.py *.c *.h
+recursive-include tests *.py
+recursive-include docs *.md *.rst *.txt
+recursive-include tools *.py
+
+global-exclude *.pyc
+global-exclude __pycache__
+global-exclude *.so
+global-exclude .DS_Store
 
 prune */__pycache__
 prune */.pytest_cache

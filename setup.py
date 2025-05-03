@@ -23,9 +23,9 @@ else:
     # Generic optimizations for other architectures
     extra_compile_args = ['-O3']
 
-# Define the C extension module
+# Define the C extension module (correct module paths for installation)
 optimized_core = Extension(
-    'src.quantum_hash.core.optimized_core',
+    'quantum_hash.core.optimized_core',
     sources=['src/quantum_hash/core/optimized_core.c'],
     extra_compile_args=extra_compile_args,
     extra_link_args=['-O3'],
@@ -34,7 +34,7 @@ optimized_core = Extension(
 
 # Hybrid hash function extension
 hybrid_core = Extension(
-    'src.quantum_hash.core.hybrid_core',
+    'quantum_hash.core.hybrid_core',
     sources=['src/quantum_hash/core/hybrid_core.c'],
     extra_compile_args=extra_compile_args,
     extra_link_args=['-O3'],
@@ -56,18 +56,22 @@ except ImportError:
 with open('README.md', 'r', encoding='utf-8') as f:
     long_description = f.read()
 
+# Version information
+VERSION = '1.0.1'  # Updated version
+
 setup(
     name='dirac-hashes',
-    version='1.0.0',
+    version=VERSION,
     description='Quantum-Resistant Cryptographic Hash Functions',
     long_description=long_description,
     long_description_content_type='text/markdown',
     author='Your Name',
     author_email='your.email@example.com',
     url='https://github.com/yourusername/dirac-hashes',
-    packages=find_packages(),
+    package_dir={'quantum_hash': 'src/quantum_hash'},  # Map the quantum_hash package to src/quantum_hash directory
+    packages=['quantum_hash'] + ['quantum_hash.' + p for p in find_packages(where='src/quantum_hash')],
     install_requires=requirements,
-    ext_modules=[optimized_core],
+    ext_modules=[optimized_core, hybrid_core],  # Include both extensions
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
@@ -85,4 +89,4 @@ setup(
         'Bug Reports': 'https://github.com/yourusername/dirac-hashes/issues',
         'Source': 'https://github.com/yourusername/dirac-hashes',
     },
-) 
+)

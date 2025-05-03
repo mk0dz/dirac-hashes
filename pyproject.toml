@@ -2,6 +2,8 @@
 requires = [
     "setuptools>=42",
     "wheel",
+    "numpy>=1.18.0",
+    "scipy>=1.4.0",
 ]
 build-backend = "setuptools.build_meta"
 
@@ -34,4 +36,13 @@ dynamic = ["version"]
 Homepage = "https://github.com/mk0dz/dirac-hashes"
 Documentation = "https://dirac-hashes.vercel.app/"
 Repository = "https://github.com/mk0dz/dirac-hashes.git"
-"Bug Tracker" = "https://github.com/mk0dz/dirac-hashes/issues" 
+"Bug Tracker" = "https://github.com/mk0dz/dirac-hashes/issues"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+
+[tool.black]
+line-length = 100
+target-version = ['py37']
+include = '\.pyi?$' 

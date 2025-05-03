@@ -388,7 +388,7 @@ def numba_enhanced_hybrid_hash(data: bytes, digest_size: int = 32) -> bytes:
             if idx < digest_size:
                 result[idx] = (state[i] >> (j * 8)) & 0xFF
     
-    return bytes(result)
+    return bytes(result) 
 
 
 def optimized_hybrid_hash(data: bytes, digest_size: int = 32) -> bytes:
