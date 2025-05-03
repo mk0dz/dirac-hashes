@@ -26,27 +26,31 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.10", "3.11"]
-
+    
     steps:
       - uses: actions/checkout@v4
-
+      
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-
+      
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
+          # Install numpy and scipy from wheels first to avoid compilation
           pip install --only-binary=numpy,scipy numpy scipy
+          # Then install remaining dependencies
           pip install qiskit matplotlib cryptography pydantic python-multipart
+          # Install development and testing dependencies
           pip install pytest pytest-cov black isort build wheel
+          # Then install the package in development mode
           pip install -e .
-
+      
       - name: Run basic tests
         run: |
           python -c "from quantum_hash.dirac import DiracHash; print(DiracHash.hash('test').hex())"
-
+      
       - name: Format with Black and isort
         run: |
           python -m black .
@@ -58,35 +62,39 @@ jobs:
     outputs:
       new_version: ${{ steps.bump_version.outputs.new_version }}
       tag_exists: ${{ steps.check_tag.outputs.exists }}
-
+    
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
+      
       - uses: actions/setup-python@v5
         with:
           python-version: "3.10"
-
+      
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install setuptools wheel build
-
+      
       - name: Bump version
         id: bump_version
         run: |
+          # Get current version from __init__.py
           current_version=$(grep -Po "__version__ = '\K[^']*" src/quantum_hash/__init__.py)
           echo "Current version: $current_version"
-
+          
+          # Use custom version if provided, otherwise calculate from bump type
           if [ -n "${{ github.event.inputs.custom_version }}" ]; then
             new_version="${{ github.event.inputs.custom_version }}"
           else
+            # Split version into components
             IFS='.' read -r -a version_parts <<< "$current_version"
             major="${version_parts[0]}"
             minor="${version_parts[1]}"
             patch="${version_parts[2]}"
-
+            
+            # Calculate new version based on bump type
             case "${{ github.event.inputs.bump_type }}" in
               patch)
                 new_patch=$((patch + 1))
@@ -102,21 +110,30 @@ jobs:
                 ;;
             esac
           fi
-
+          
           echo "New version: $new_version"
+          
+          # Update version in __init__.py
           sed -i "s/__version__ = '$current_version'/__version__ = '$new_version'/" src/quantum_hash/__init__.py
-
+          
+          # Update version in pyproject.toml if it exists
           if [ -f "pyproject.toml" ]; then
             sed -i "s/version = \"$current_version\"/version = \"$new_version\"/" pyproject.toml
           fi
-
+          
+          # Update version in setup.py if it exists
           if [ -f "setup.py" ]; then
             sed -i "s/VERSION = '$current_version'/VERSION = '$new_version'/" setup.py
           fi
-
+          
+          # Output new version
           echo "new_version=$new_version" >> $GITHUB_OUTPUT
+          
+          # Configure git
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
+          
+          # Commit version changes
           git commit -am "Bump version to $new_version"
           git push
 
@@ -130,41 +147,47 @@ jobs:
           else
             echo "Tag v$new_version does not exist"
             echo "exists=false" >> $GITHUB_OUTPUT
+            
+            # Create and push tag only if it doesn't exist
             git tag "v$new_version"
             git push origin "v$new_version"
+          fi
 
   release-build:
     needs: version-bump
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+
     steps:
       - uses: actions/checkout@v4
         with:
           ref: main
-
+      
       - uses: actions/setup-python@v5
         with:
           python-version: "3.10"
-
-      - name: Install cibuildwheel
+      
+      - name: Install build dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install cibuildwheel==2.16.5  # latest as of 2025
-
-      - name: Build wheels with cibuildwheel
-        env:
-          CIBW_SKIP: "pp*"
+          python -m pip install --upgrade setuptools wheel build
+          python -m pip install --only-binary=numpy,scipy numpy scipy
+      
+      - name: Build package
         run: |
-          cibuildwheel --output-dir dist
+          # Use the modern build approach
+          python -m build --sdist --wheel
+          
+          # List all built packages
+          echo "Built packages:"
+          ls -la dist/
 
       - name: Upload distributions
         uses: actions/upload-artifact@v4
         with:
           name: release-dists
-          path: dist/
-
+          path: |
+            dist/
+      
       - name: Create GitHub Release
         if: needs.version-bump.outputs.tag_exists != 'true'
         uses: softprops/action-gh-release@v1
@@ -172,7 +195,8 @@ jobs:
           tag_name: v${{ needs.version-bump.outputs.new_version }}
           name: Release v${{ needs.version-bump.outputs.new_version }}
           generate_release_notes: true
-          files: dist/*
+          files: |
+            dist/*
 
   pypi-publish:
     runs-on: ubuntu-latest
