@@ -173,21 +173,12 @@ jobs:
           python -m pip install --only-binary=numpy,scipy numpy scipy
           python -m pip install cibuildwheel twine
 
-      - name: Build package
-        run: |
-          # Use the modern build approach
-          python -m build --sdist 
       - name: Build wheels with cibuildwheel
         env:
-          CIBW_BUILD: cp38-* cp39-* cp310-* cp311-*
-          CIBW_SKIP: *-musllinux*
-          CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
-          CIBW_BEFORE_BUILD: pip install --only-binary=numpy,scipy numpy scipy
-          CIBW_TEST_REQUIRES: pytest
-          CIBW_TEST_COMMAND: "python -c \"from quantum_hash.dirac import DiracHash; print(DiracHash.hash('test').hex())\" || true"
+          CIBW_SKIP: "pp*"
         run: |
-          python -m cibuildwheel --output-dir dist/
-          
+          cibuildwheel --output-dir dist
+      
       - name: Upload distributions
         uses: actions/upload-artifact@v4
         with:
