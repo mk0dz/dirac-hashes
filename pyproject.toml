@@ -20,7 +20,7 @@ description = "Quantum-resistant hash functions and post-quantum cryptography fo
 readme = "README.md"
 requires-python = ">=3.7"
 keywords = ["quantum", "cryptography", "hash", "signatures", "blockchain"]
-license = {text = "MIT"}
+license = "MIT"  # Updated to SPDX format
 classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.7",
@@ -45,7 +45,7 @@ dependencies = [
 
 [project.urls]
 Homepage = "https://github.com/mk0dz/dirac-hashes"
-Documentation = "https://dirac-hashes.vercel.app/"
+Documentation = "https://hashes.dirac.fun/"
 Repository = "https://github.com/mk0dz/dirac-hashes.git"
 "Bug Tracker" = "https://github.com/mk0dz/dirac-hashes/issues"
 
@@ -66,4 +66,4 @@ before-build = "pip install --only-binary=numpy,scipy numpy scipy"
 environment = "PIP_PREFER_BINARY=1"
 test-requires = ["pytest"]
 test-command = "pytest {project}/tests/"
-build-verbosity = 3 
+build-verbosity = 3

@@ -9,18 +9,17 @@ from setuptools import setup, find_packages, Extension
 import os
 import sys
 import platform
-from pathlib import Path
-
-# Get the absolute path of the current directory
-here = Path(__file__).absolute().parent
 
 # Get version from __init__.py
-version_file = here / 'src' / 'quantum_hash' / '__init__.py'
-with open(version_file, 'r') as f:
-    for line in f:
-        if line.startswith('__version__'):
-            VERSION = line.strip().split('=')[1].strip(" '\"")
-            break
+VERSION = '0.1.4'  # This will be updated by the CI/CD workflow
+try:
+    with open('src/quantum_hash/__init__.py', 'r') as f:
+        for line in f:
+            if line.startswith('__version__'):
+                VERSION = line.strip().split('=')[1].strip(" '\"")
+                break
+except FileNotFoundError:
+    pass
 
 # Detect if we're on x86 architecture to enable SSE/AVX optimizations
 is_x86 = platform.machine().lower() in ['x86_64', 'amd64', 'i386', 'i686']
@@ -35,10 +34,10 @@ else:
     # Generic optimizations for other architectures
     extra_compile_args = ['-O3']
 
-# Define the C extension module (use Path to ensure correct paths)
+# Define the C extension modules with relative paths
 optimized_core = Extension(
     'quantum_hash.core.optimized_core',
-    sources=[str(here / 'src' / 'quantum_hash' / 'core' / 'optimized_core.c')],
+    sources=['src/quantum_hash/core/optimized_core.c'],
     extra_compile_args=extra_compile_args,
     extra_link_args=['-O3'],
     include_dirs=[],
@@ -47,7 +46,7 @@ optimized_core = Extension(
 # Hybrid hash function extension
 hybrid_core = Extension(
     'quantum_hash.core.hybrid_core',
-    sources=[str(here / 'src' / 'quantum_hash' / 'core' / 'hybrid_core.c')],
+    sources=['src/quantum_hash/core/hybrid_core.c'],
     extra_compile_args=extra_compile_args,
     extra_link_args=['-O3'],
 )
@@ -68,18 +67,12 @@ except ImportError:
     has_numba = False
     requirements.append('numba>=0.50.0')
 
-with open(here / 'README.md', 'r', encoding='utf-8') as f:
-    long_description = f.read()
-
-# Simplify package discovery to avoid path issues
-quantum_hash_packages = ['quantum_hash']
-for root, dirs, files in os.walk('src/quantum_hash'):
-    if '__pycache__' in root or '.pytest_cache' in root:
-        continue
-    
-    pkg = root.replace('src/', '').replace('/', '.')
-    if pkg != 'quantum_hash' and '__pycache__' not in pkg:
-        quantum_hash_packages.append(pkg)
+# Read README for long description
+try:
+    with open('README.md', 'r', encoding='utf-8') as f:
+        long_description = f.read()
+except FileNotFoundError:
+    long_description = 'Quantum-Resistant Cryptographic Hash Functions'
 
 setup(
     name='dirac-hashes',
@@ -91,7 +84,7 @@ setup(
     author_email='example@example.com',
     url='https://github.com/mk0dz/dirac-hashes',
     package_dir={'': 'src'},  # Specify src as the root directory for all packages
-    packages=quantum_hash_packages,  # Use pre-computed package list
+    packages=find_packages(where='src'),  # Simplify package discovery
     package_data={
         'quantum_hash': ['*.c', '*.h', 'core/*.c', 'core/*.h'],  # Include C source and header files
     },

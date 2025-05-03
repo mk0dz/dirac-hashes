@@ -42,18 +42,17 @@ jobs:
           pip install --only-binary=numpy,scipy numpy scipy
           # Then install remaining dependencies
           pip install qiskit matplotlib cryptography pydantic python-multipart
-          # Then install the package
+          # Install development and testing dependencies
+          pip install pytest pytest-cov black isort build wheel
+          # Then install the package in development mode
           pip install -e .
-          pip install pytest pytest-cov
       
       - name: Run basic tests
         run: |
           python -c "from quantum_hash.dirac import DiracHash; print(DiracHash.hash('test').hex())"
       
-      - name: Format with Black
+      - name: Format with Black and isort
         run: |
-          # Format code instead of just checking
-          pip install black isort
           python -m black .
           python -m isort .
 
@@ -76,7 +75,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install setuptools wheel
+          pip install setuptools wheel build
       
       - name: Bump version
         id: bump_version
@@ -167,21 +166,16 @@ jobs:
         with:
           python-version: "3.10"
       
-      - name: Build source distribution
+      - name: Install build dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install --upgrade setuptools wheel
-          python setup.py sdist
-
-      - name: Build wheels directly
-        run: |
-          # Install build dependencies
-          python -m pip install --upgrade pip
-          python -m pip install --upgrade setuptools wheel
+          python -m pip install --upgrade setuptools wheel build
           python -m pip install --only-binary=numpy,scipy numpy scipy
-          
-          # Build wheel using setuptools directly 
-          python setup.py bdist_wheel
+      
+      - name: Build package
+        run: |
+          # Use the modern build approach
+          python -m build --sdist --wheel
           
           # List all built packages
           echo "Built packages:"
@@ -219,15 +213,8 @@ jobs:
           name: release-dists
           path: dist/
 
-      - name: Prepare all packages for PyPI
-        run: |
-          mkdir -p packages
-          cp dist/*.tar.gz packages/
-          cp dist/*.whl packages/ || true
-          ls -la packages/
-
       - name: Publish release distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          packages-dir: packages/
+          packages-dir: dist/
           skip-existing: true
