@@ -178,12 +178,32 @@ jobs:
         run: |
           python -m build --sdist
 
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+          
+      - name: Create setup.cfg for build
+        run: |
+          echo "[metadata]" > setup.cfg
+          echo "name = dirac-hashes" >> setup.cfg
+          echo "[build_ext]" >> setup.cfg
+          echo "inplace = 1" >> setup.cfg
+          
       - name: Build wheels for multiple platforms
         uses: pypa/cibuildwheel@v2.16.2
         env:
-          CIBW_BUILD: "cp38-* cp39-* cp310-* cp311-*"
-          CIBW_SKIP: "*-musllinux*"
-          CIBW_BEFORE_BUILD: "pip install --only-binary=numpy,scipy numpy scipy"
+            CIBW_BUILD: "cp38-* cp39-* cp310-* cp311-*"
+            CIBW_SKIP: "*-musllinux*"
+            CIBW_BEFORE_BUILD: "pip install --only-binary=numpy,scipy numpy scipy"
+            CIBW_ENVIRONMENT: "PIP_PREFER_BINARY=1 PIP_DISABLE_PIP_VERSION_CHECK=1"
+            CIBW_BUILD_VERBOSITY: 3
+            CIBW_PROJECT_REQUIRES_PYTHON: ">=3.7"
+            CIBW_REPAIR_WHEEL_COMMAND: ""
+            CIBW_BEFORE_ALL: |
+              python -m pip install --upgrade pip
+              python -m pip install --upgrade setuptools wheel
+            CIBW_TEST_SKIP: "*_musllinux* *-win32"
       
       - name: Upload distributions
         uses: actions/upload-artifact@v4

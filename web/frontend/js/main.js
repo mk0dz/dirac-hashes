@@ -87,6 +87,158 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize charts
     initializeCharts();
+
+    // Add event listener for the keypair generation in Test Hashes
+    const generateKeypairBtn = document.getElementById('generate-keypair');
+    if (generateKeypairBtn) {
+        generateKeypairBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const scheme = document.getElementById('keypair-scheme').value;
+            const securityLevel = document.getElementById('keypair-security-level').value;
+            const hashAlgorithm = document.getElementById('keypair-hash-algorithm').value;
+            
+            const resultDiv = document.getElementById('keypair-result');
+            resultDiv.innerHTML = '<div class="loader"></div> Generating key pair...';
+            
+            // Call the API to generate a key pair
+            fetch('/api/signatures/keypair', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    scheme: scheme,
+                    security_level: parseInt(securityLevel),
+                    hash_algorithm: hashAlgorithm
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to generate key pair');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Display the key pair
+                resultDiv.innerHTML = `
+                    <h4>Key Pair Generated</h4>
+                    <div class="key-info">
+                        <p><strong>Scheme:</strong> ${data.scheme}</p>
+                        <p><strong>Security Level:</strong> ${data.security_level}</p>
+                        <p><strong>Hash Algorithm:</strong> ${data.hash_algorithm}</p>
+                        <p><strong>Generation Time:</strong> ${data.time_ms.toFixed(2)} ms</p>
+                    </div>
+                    <div class="key-data">
+                        <h5>Public Key</h5>
+                        <div class="code-block key-display">${truncateKey(data.public_key)}</div>
+                        <button class="copy-btn" data-target="public-key">Copy Full Key</button>
+                        <input type="hidden" id="full-public-key" value="${data.public_key}">
+                        
+                        <h5>Private Key</h5>
+                        <div class="code-block key-display">${truncateKey(data.private_key)}</div>
+                        <button class="copy-btn" data-target="private-key">Copy Full Key</button>
+                        <input type="hidden" id="full-private-key" value="${data.private_key}">
+                    </div>
+                `;
+                
+                // Set up copy buttons
+                document.querySelectorAll('.copy-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const target = this.getAttribute('data-target');
+                        let textToCopy;
+                        
+                        if (target === 'public-key') {
+                            textToCopy = document.getElementById('full-public-key').value;
+                        } else if (target === 'private-key') {
+                            textToCopy = document.getElementById('full-private-key').value;
+                        }
+                        
+                        if (textToCopy) {
+                            navigator.clipboard.writeText(textToCopy)
+                                .then(() => {
+                                    this.textContent = 'Copied!';
+                                    setTimeout(() => {
+                                        this.textContent = 'Copy Full Key';
+                                    }, 2000);
+                                })
+                                .catch(err => {
+                                    console.error('Failed to copy text:', err);
+                                });
+                        }
+                    });
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                resultDiv.innerHTML = `<div class="error">Error generating key pair: ${error.message}</div>`;
+            });
+        });
+    }
+});
+
+// Helper function to truncate key display
+function truncateKey(key) {
+    if (key.length <= 64) return key;
+    return key.substring(0, 32) + '...' + key.substring(key.length - 32);
+}
+
+// Add CSS for key display
+document.addEventListener('DOMContentLoaded', function() {
+    const style = document.createElement('style');
+    style.textContent = `
+        .key-display {
+            font-family: monospace;
+            word-break: break-all;
+            max-height: 100px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+        }
+        
+        .key-info {
+            margin-bottom: 20px;
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+        }
+        
+        .key-data {
+            margin-top: 20px;
+        }
+        
+        .copy-btn {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .copy-btn:hover {
+            background-color: #5a6268;
+        }
+        
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 2s linear infinite;
+            display: inline-block;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    `;
+    document.head.appendChild(style);
 });
 
 // Navigation between pages
