@@ -27,14 +27,14 @@ The library includes:
 
 ## API Usage Guide
 
-Our API is live at `https://dirac-hashes.onrender.com`. Here are practical examples for using each feature:
+Our API is live at `https://dirac-hashes-9a4w.onrender.com`. Here are practical examples for using each feature:
 
 ### Hash Functions
 
 #### Compare Multiple Hash Algorithms
 
 ```bash
-curl -X POST 'https://dirac-hashes.onrender.com/api/hash/compare' \
+curl -X POST 'https://dirac-hashes-9a4w.onrender.com/api/hash/compare' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{"message":"I am groot","algorithms":["improved","grover","shor"],"encoding":"utf-8"}' | python -m json.tool
@@ -55,7 +55,7 @@ Response:
 #### Generate a Single Hash
 
 ```bash
-curl -X POST 'https://dirac-hashes.onrender.com/api/hash/generate' \
+curl -X POST 'https://dirac-hashes-9a4w.onrender.com/api/hash/generate' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{"message":"Quantum supremacy","algorithm":"improved","encoding":"utf-8"}' | python -m json.tool
@@ -66,7 +66,7 @@ curl -X POST 'https://dirac-hashes.onrender.com/api/hash/generate' \
 #### Generate a Signature Keypair
 
 ```bash
-curl -X POST 'https://dirac-hashes.onrender.com/api/signatures/keypair' \
+curl -X POST 'https://dirac-hashes-9a4w.onrender.com/api/signatures/keypair' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{"scheme":"dilithium","hash_algorithm":"improved","security_level":1}' | python -m json.tool
@@ -77,7 +77,7 @@ Save the returned `public_key` and `private_key` for the next steps.
 #### Sign a Message
 
 ```bash
-curl -X POST 'https://dirac-hashes.onrender.com/api/signatures/sign' \
+curl -X POST 'https://dirac-hashes-9a4w.onrender.com/api/signatures/sign' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -93,7 +93,7 @@ Save the returned `signature` for verification.
 #### Verify a Signature
 
 ```bash
-curl -X POST 'https://dirac-hashes.onrender.com/api/signatures/verify' \
+curl -X POST 'https://dirac-hashes-9a4w.onrender.com/api/signatures/verify' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -110,7 +110,7 @@ curl -X POST 'https://dirac-hashes.onrender.com/api/signatures/verify' \
 #### Generate a KEM Keypair
 
 ```bash
-curl -X POST 'https://dirac-hashes.onrender.com/api/kem/keypair' \
+curl -X POST 'https://dirac-hashes-9a4w.onrender.com/api/kem/keypair' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{"scheme":"kyber","hash_algorithm":"improved","security_level":1}' | python -m json.tool
@@ -121,7 +121,7 @@ Save the returned `public_key` and `private_key` for the next steps.
 #### Encapsulate a Shared Secret
 
 ```bash
-curl -X POST 'https://dirac-hashes.onrender.com/api/kem/encapsulate' \
+curl -X POST 'https://dirac-hashes-9a4w.onrender.com/api/kem/encapsulate' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -136,7 +136,7 @@ Save the returned `ciphertext` and `shared_secret` for the next step.
 #### Decapsulate to Retrieve the Shared Secret
 
 ```bash
-curl -X POST 'https://dirac-hashes.onrender.com/api/kem/decapsulate' \
+curl -X POST 'https://dirac-hashes-9a4w.onrender.com/api/kem/decapsulate' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -153,7 +153,7 @@ This example demonstrates a complete workflow for secure communication:
 
 1. **Generate KEM keypair for recipient:**
 ```bash
-curl -X POST 'https://dirac-hashes.onrender.com/api/kem/keypair' \
+curl -X POST 'https://dirac-hashes-9a4w.onrender.com/api/kem/keypair' \
   -H 'Content-Type: application/json' \
   -d '{"scheme":"kyber","hash_algorithm":"improved","security_level":1}' > recipient_keys.json
 ```
@@ -161,14 +161,14 @@ curl -X POST 'https://dirac-hashes.onrender.com/api/kem/keypair' \
 2. **Sender encapsulates a shared secret using recipient's public key:**
 ```bash
 recipient_public_key=$(cat recipient_keys.json | jq -r '.public_key')
-curl -X POST 'https://dirac-hashes.onrender.com/api/kem/encapsulate' \
+curl -X POST 'https://dirac-hashes-9a4w.onrender.com/api/kem/encapsulate' \
   -H 'Content-Type: application/json' \
   -d "{\"public_key\":\"$recipient_public_key\",\"scheme\":\"kyber\",\"hash_algorithm\":\"improved\"}" > encapsulation.json
 ```
 
 3. **Sender signs the encrypted message with their own signature key:**
 ```bash
-curl -X POST 'https://dirac-hashes.onrender.com/api/signatures/keypair' \
+curl -X POST 'https://dirac-hashes-9a4w.onrender.com/api/signatures/keypair' \
   -H 'Content-Type: application/json' \
   -d '{"scheme":"dilithium","hash_algorithm":"improved","security_level":1}' > sender_sig_keys.json
 
@@ -179,7 +179,7 @@ ciphertext=$(cat encapsulation.json | jq -r '.ciphertext')
 # Create a message containing the encrypted data (in real system, you'd encrypt with the shared secret)
 message="Encrypted data: $ciphertext"
 
-curl -X POST 'https://dirac-hashes.onrender.com/api/signatures/sign' \
+curl -X POST 'https://dirac-hashes-9a4w.onrender.com/api/signatures/sign' \
   -H 'Content-Type: application/json' \
   -d "{\"message\":\"$message\",\"private_key\":\"$sender_private_key\",\"scheme\":\"dilithium\",\"hash_algorithm\":\"improved\"}" > signed_message.json
 ```
@@ -189,7 +189,7 @@ curl -X POST 'https://dirac-hashes.onrender.com/api/signatures/sign' \
 sender_public_key=$(cat sender_sig_keys.json | jq -r '.public_key')
 signature=$(cat signed_message.json | jq -r '.signature')
 
-curl -X POST 'https://dirac-hashes.onrender.com/api/signatures/verify' \
+curl -X POST 'https://dirac-hashes-9a4w.onrender.com/api/signatures/verify' \
   -H 'Content-Type: application/json' \
   -d "{\"message\":\"$message\",\"signature\":\"$signature\",\"public_key\":\"$sender_public_key\",\"scheme\":\"dilithium\",\"hash_algorithm\":\"improved\"}" > verification.json
 ```
@@ -198,7 +198,7 @@ curl -X POST 'https://dirac-hashes.onrender.com/api/signatures/verify' \
 ```bash
 recipient_private_key=$(cat recipient_keys.json | jq -r '.private_key')
 
-curl -X POST 'https://dirac-hashes.onrender.com/api/kem/decapsulate' \
+curl -X POST 'https://dirac-hashes-9a4w.onrender.com/api/kem/decapsulate' \
   -H 'Content-Type: application/json' \
   -d "{\"private_key\":\"$recipient_private_key\",\"ciphertext\":\"$ciphertext\",\"scheme\":\"kyber\",\"hash_algorithm\":\"improved\"}" > decapsulation.json
 ```

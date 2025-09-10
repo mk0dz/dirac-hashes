@@ -1085,7 +1085,7 @@ hash_value = hashlib.sha256(message.encode('utf-8')).hexdigest()
 
 # After (Dirac Improved)
 import requests
-response = requests.post('https://dirac-hashes.onrender.com/api/hash/generate', 
+response = requests.post('https://dirac-hashes-9a4w.onrender.com/api/hash/generate', 
                         json={'message': message, 'algorithm': 'improved', 'encoding': 'utf-8'})
 hash_value = response.json()['hash']
                         </div>

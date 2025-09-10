@@ -28,7 +28,7 @@ The frontend interface provides a user-friendly way to interact with the Dirac H
 
 ### API Integration
 
-The frontend connects to the API using the URL specified in `js/app.js`. For local development, it uses `http://localhost:8000`. For production, it uses `https://dirac-hashes.onrender.com`.
+The frontend connects to the API using the URL specified in `js/app.js`. For local development, it uses `http://localhost:8000`. For production, it uses `https://dirac-hashes-9a4w.onrender.com`.
 
 To change the API endpoint:
 1. Edit `frontend/js/app.js`

@@ -1,7 +1,7 @@
 // Configuration
 const API_URL = window.location.hostname === 'localhost' 
   ? 'http://localhost:8000' 
-  : 'https://dirac-hashes.onrender.com';
+  : 'https://dirac-hashes-9a4w.onrender.com';
 
 // Helper functions for API calls
 function showLoading(elementId, message = 'Loading...') {

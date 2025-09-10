@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Global API URL - change this to your deployed API URL
-const API_URL = 'https://dirac-hashes.onrender.com';
+const API_URL = 'https://dirac-hashes-9a4w.onrender.com';
 
 // Page Navigation
 function setupNavigation() {
