@@ -21,6 +21,11 @@ try:
 except FileNotFoundError:
     pass
 
+# Pure-Python install (skip the optional C hash extensions). The post-quantum
+# `quantum_hash.pqc` package is pure Python and never needs them; only the legacy
+# DiracHash speedups do. Honoured as documented in the README.
+PURE_PYTHON = os.environ.get('DIRAC_PURE_PYTHON', '0') == '1'
+
 # Detect if we're on x86 architecture to enable SSE/AVX optimizations
 is_x86 = platform.machine().lower() in ['x86_64', 'amd64', 'i386', 'i686']
 
@@ -90,7 +95,9 @@ setup(
     },
     include_package_data=True,
     install_requires=requirements,
-    ext_modules=[optimized_core, hybrid_core],  # Include both extensions
+    # The C extensions are optional accelerators for the legacy hashes; skip them
+    # for a pure-Python install (DIRAC_PURE_PYTHON=1).
+    ext_modules=[] if PURE_PYTHON else [optimized_core, hybrid_core],
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
